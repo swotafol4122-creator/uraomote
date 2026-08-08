@@ -191,9 +191,11 @@ body.in-battle #nav{display:none}
   background-size:280% 100%;animation:sheen 3.6s linear infinite}
 @keyframes sheen{from{background-position:280% 0}to{background-position:-80% 0}}
 .raritybar{display:flex;gap:5px;flex-wrap:wrap;margin:8px 0 2px}
-.card.locked{filter:grayscale(1) brightness(.44);cursor:default}
+.card.locked{filter:grayscale(.85) brightness(.58);cursor:pointer}
+.card.locked:hover{filter:grayscale(.4) brightness(.8)}
 .card .own{position:absolute;top:29px;right:6px;font-family:var(--mincho);font-size:11px;font-weight:800;
   color:#2b1f0a;background:rgba(255,255,255,.78);border:1px solid #8d7f66;border-radius:2px;padding:0 4px;z-index:3}
+.card .own.none{color:#7d2418;background:rgba(255,255,255,.6);border-color:#a8785f}
 .card.cur{box-shadow:0 0 0 2px var(--kin-hi),0 6px 18px rgba(0,0,0,.6)}
 .facetag{font-family:var(--mincho);font-size:10px;letter-spacing:.24em;margin-top:6px;color:var(--gray)}
 .facetag.now{color:var(--kin-hi)}
@@ -795,8 +797,11 @@ CARDS.push(
  u:{n:'無手の甲冑',g:'無',c:5,t:'u',a:4,h:5,kw:['盾','成長','不屈']}},
 
 {id:'ha23',nm:'不壊・カンナビ',asp:'ha',rar:'神',
- o:{n:'不壊ノカンナビ',g:'壊',c:8,t:'u',a:6,h:10,kw:['重盾','反射','結界','不屈']},
- u:{n:'鎮まりノカンナビ',g:'鎮',c:6,t:'u',a:4,h:7,kw:['重盾','成長'],fx:{on:'turn',op:'buffAll',a:1,h:1},tx:'自ターン開始時：味方全てに+1/+1'}}
+ o:{n:'不壊ノカンナビ',g:'壊',c:8,t:'u',a:6,h:10,kw:['重盾','反射','結界','不屈'],
+    fx:{on:'play',ops:[{op:'grantAll',kw:'重盾'},{op:'healLeader',v:6}]},
+    tx:'登場時：味方全てに重盾、自分の命+6'},
+ u:{n:'鎮まりノカンナビ',g:'鎮',c:6,t:'u',a:4,h:7,kw:['重盾','成長','不屈'],
+    fx:{on:'turn',op:'buffAll',a:1,h:1},tx:'自ターン開始時：味方全てに+1/+1'}}
 );
 
 /* ══════════ 雷 ══════════ */
@@ -875,8 +880,10 @@ CARDS.push(
  u:{n:'一条の雷',g:'条',c:4,t:'s',tgt:'enemy',fx:{on:'cast',ops:[{op:'destroyTarget'},{op:'dmgLeader',v:3}]},tx:'敵1体を破壊し、相手の命に3'}},
 
 {id:'ka24',nm:'八雷・ナルカミ',asp:'ka',rar:'神',
- o:{n:'八雷ノナルカミ',g:'八',c:8,t:'u',a:6,h:6,kw:['速攻','連撃','貫通','余波']},
- u:{n:'雷鳴ノ胎動',g:'胎',c:6,t:'u',a:4,h:5,kw:['速攻'],fx:{on:'turn',ops:[{op:'gainKi',v:3},{op:'dmgLeader',v:1}]},tx:'自ターン開始時：気+3、相手の命に1'}}
+ o:{n:'八雷ノナルカミ',g:'八',c:8,t:'u',a:6,h:6,kw:['速攻','連撃','貫通'],
+    fx:{on:'play',ops:[{op:'dmgAllEnemy',v:3},{op:'dmgLeader',v:3}]},tx:'登場時：敵全てに3、相手の命に3'},
+ u:{n:'雷鳴ノ胎動',g:'胎',c:6,t:'u',a:4,h:5,kw:['速攻','成長'],
+    fx:{on:'turn',ops:[{op:'gainKi',v:3},{op:'dmgLeader',v:1}]},tx:'自ターン開始時：気+3、相手の命に1'}}
 );
 
 /* ══════════ 蔦 ══════════ */
@@ -2139,8 +2146,13 @@ function bothFaces(C,cur,big){
 function cardDetail(C){
   const A=ASP[C.asp];
   const kwall=[].concat(C.o.kw||[],C.u.kw||[]).filter((v,i,a)=>a.indexOf(v)===i);
+  const n=ownedCount(C.id), cap=copyCap(C);
+  const own = n>0
+    ? `<span style="color:var(--kin-hi)">所持 ${n}／${cap}枚</span>`
+    : `<span style="color:#e8674f">未所持</span>　<span class="muted">封札から出ます（${C.rar}の出やすさ ${RAR[C.rar].w}%）</span>`;
   sheet(`<h3>${esc(C.nm)}</h3>
-   <div class="crumb">${A.n}の相 ／ ${C.rar} ／ 同名は${copyCap(C)}枚まで</div>
+   <div class="crumb">${A.n}の相 ／ <span style="color:${RAR[C.rar].c}">${C.rar}</span> ／ 同名は${cap}枚まで</div>
+   <p style="font-size:13px;margin:8px 0 0">${own}</p>
    ${bothFaces(C,null,1)}
    ${kwall.length?`<div style="margin-top:14px">${kwall.map(k=>`<p class="muted" style="margin:2px 0"><span class="kw">${k}</span>${KWTX[k]||''}</p>`).join('')}</div>`:''}
    <button class="btn wide ghost" style="margin-top:12px" onclick="closeSheet()">閉じる</button>`);
@@ -2370,25 +2382,31 @@ function leaveVersus(){
 }
 
 /* ============ 蔵 ============ */
-let COLLA='all', COLLR='all';
+let COLLA='all', COLLR='all', COLLH='all';
 function drawColl(){
   const ak=['all'].concat(ASPLIST,['nu']);
   const atabs=ak.map(k=>`<button class="asel ${COLLA===k?'on':''}" onclick="COLLA='${k}';drawColl()">${k==='all'?'全て':ASP[k].n}</button>`).join('');
   const rk=['all','常','珍','秘','極','神'];
   const rtabs=rk.map(k=>`<button class="asel ${COLLR===k?'on':''}" onclick="COLLR='${k}';drawColl()">${k==='all'?'全位':k}</button>`).join('');
-  const list=CARDS.filter(c=>(COLLA==='all'||c.asp===COLLA)&&(COLLR==='all'||c.rar===COLLR));
-  const have=list.filter(c=>ownedCount(c.id)>0).length;
+  const hk=[['all','全部'],['have','持っている'],['none','まだ無い']];
+  const htabs=hk.map(k=>`<button class="asel ${COLLH===k[0]?'on':''}" onclick="COLLH='${k[0]}';drawColl()">${k[1]}</button>`).join('');
+  const base=CARDS.filter(c=>(COLLA==='all'||c.asp===COLLA)&&(COLLR==='all'||c.rar===COLLR));
+  const list=base.filter(c=>COLLH==='all'||(COLLH==='have'?ownedCount(c.id)>0:ownedCount(c.id)===0));
+  const have=base.filter(c=>ownedCount(c.id)>0).length;
   const grid=list.map(c=>{
     const n=ownedCount(c.id);
-    return cardHTML(c,'o',{cls:n?'':'locked',own:n?`<div class="own">×${n}</div>`:'',
-      attr:n?`onclick="cardDetail(BYID['${c.id}'])" tabindex="0" data-tap="1" role="button"`:''});
-  }).join('');
+    return cardHTML(c,'o',{cls:n?'':'locked',
+      own:n?`<div class="own">×${n}</div>`:`<div class="own none">未</div>`,
+      attr:`onclick="cardDetail(BYID['${c.id}'])" tabindex="0" data-tap="1" role="button"`});
+  }).join('') || '<p class="muted">この絞り込みに当てはまる札はありません。</p>';
   $('screen-coll').innerHTML=`
     <div class="topbar"><h2>蔵</h2><div class="spacer"></div>
-      <div class="coin">${have}／${list.length} 種</div></div>
+      <div class="coin">${have}／${base.length} 種</div></div>
     <div class="aspbar">${atabs}</div>
     <div class="raritybar">${rtabs}</div>
-    <p class="muted" style="margin:6px 0 12px">全${CARDS.length}種・各2面で${CARDS.length*2}通りの顔。所持は${collSize()}種。札をタップすると両面を確かめられます。</p>
+    <div class="raritybar">${htabs}</div>
+    <p class="muted" style="margin:6px 0 12px">全${CARDS.length}種・各2面で${CARDS.length*2}通りの顔。所持は${collSize()}種。
+      <b>まだ持っていない札もタップすれば表裏の効果を読めます。</b></p>
     <div class="grid">${grid}</div>`;
 }
 
