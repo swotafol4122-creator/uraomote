@@ -117,13 +117,14 @@ body.in-battle #nav{display:none}
 .title-copy{max-width:400px;color:#a49889;font-size:13.5px;margin:0 auto 26px;line-height:1.9}
 .title-copy b{color:var(--paper);font-weight:500}
 
-/* ── カード ── */
+/* ── カード（重ならないように縦の流し込みで組む） ── */
 .card{position:relative;width:126px;height:184px;flex:0 0 auto;border-radius:var(--r);
   background:linear-gradient(168deg,#efe8d8,#cdc0a5 76%,#b9ab8e);
   color:#241c15;font-family:var(--goth);
   box-shadow:0 2px 0 rgba(0,0,0,.5),0 6px 16px rgba(0,0,0,.5);
-  border:1px solid #8d7f66;overflow:hidden;transition:transform .16s,box-shadow .16s;cursor:pointer}
-.card.big{width:168px;height:246px}
+  border:1px solid #8d7f66;overflow:hidden;transition:transform .16s,box-shadow .16s;cursor:pointer;
+  display:flex;flex-direction:column;align-items:center;padding:31px 7px 6px}
+.card.big{width:176px;height:258px;padding:44px 12px 10px}
 .card::before{content:"";position:absolute;inset:0;pointer-events:none;
   background:repeating-linear-gradient(48deg,rgba(120,100,70,.06) 0 1px,transparent 1px 3px)}
 .card .edge{position:absolute;inset:3px;border:1px solid rgba(90,70,40,.35);border-radius:2px;pointer-events:none}
@@ -133,33 +134,36 @@ body.in-battle #nav{display:none}
   color:#2b1f0a;border:1px solid #6d5626;box-shadow:0 1px 3px rgba(0,0,0,.45)}
 .card .asp{position:absolute;top:7px;right:7px;font-family:var(--mincho);font-size:13px;font-weight:700;z-index:3;
   width:22px;height:22px;display:grid;place-items:center;border-radius:2px}
-.card .glyphwrap{position:absolute;top:34px;left:0;right:0;display:grid;place-items:center}
-.card .glyph{width:62px;height:62px;border-radius:50%;display:grid;place-items:center;
-  font-family:var(--mincho);font-weight:800;font-size:34px;color:#f4ecda;
+.card .glyphwrap{flex:0 0 auto;display:grid;place-items:center}
+.card .glyph{width:58px;height:58px;border-radius:50%;display:grid;place-items:center;
+  font-family:var(--mincho);font-weight:800;font-size:32px;color:#f4ecda;
   box-shadow:inset 0 0 0 1px rgba(255,255,255,.2),0 2px 6px rgba(0,0,0,.35)}
 .card.big .glyph{width:80px;height:80px;font-size:44px}
-.card.big .glyphwrap{top:44px}
-.card .nm{position:absolute;left:0;right:0;top:100px;text-align:center;font-family:var(--mincho);
-  font-weight:700;font-size:12.5px;letter-spacing:.02em;padding:0 4px;line-height:1.25}
-.card.big .nm{top:132px;font-size:15px}
-.card .rule{position:absolute;left:12px;right:12px;top:120px;height:1px;background:linear-gradient(90deg,transparent,#8d7a55,transparent)}
-.card.big .rule{top:156px}
-.card .tx{position:absolute;left:8px;right:8px;top:124px;font-size:9px;line-height:1.34;color:#4a3b28;
-  text-align:center;max-height:30px;overflow:hidden}
-.card.big .tx{top:163px;font-size:11.5px;left:12px;right:12px;max-height:58px;line-height:1.45}
-.card .stats{position:absolute;bottom:5px;left:7px;right:7px;display:flex;justify-content:space-between;
+.card .nm{flex:0 0 auto;margin-top:5px;font-family:var(--mincho);font-weight:700;font-size:12px;
+  letter-spacing:.01em;line-height:1.18;text-align:center;max-width:100%;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.card.big .nm{font-size:16px;margin-top:9px}
+.card .rule{flex:0 0 auto;width:76%;height:1px;margin:4px 0 3px;
+  background:linear-gradient(90deg,transparent,#8d7a55,transparent)}
+.card.big .rule{margin:7px 0 5px}
+.card .tx{flex:1 1 auto;min-height:0;width:100%;font-size:9px;line-height:1.32;color:#4a3b28;
+  text-align:center;overflow:hidden;
+  display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical}
+.card.big .tx{font-size:12px;line-height:1.5;-webkit-line-clamp:5}
+.card .kws{flex:0 0 auto;max-width:100%;font-size:8.5px;letter-spacing:.06em;color:#6b5335;
+  line-height:1.2;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.card.big .kws{font-size:11px;margin-bottom:4px}
+.card .stats{flex:0 0 auto;display:flex;gap:11px;align-items:baseline;
   font-family:var(--mincho);font-weight:800;font-size:15px}
-.card.big .stats{font-size:19px;bottom:8px;left:11px;right:11px}
+.card.big .stats{font-size:21px;gap:16px}
 .card .stats .a{color:#7d2418}.card .stats .h{color:#1d4462}
-.card .kws{position:absolute;bottom:22px;left:0;right:0;text-align:center;font-size:8.5px;letter-spacing:.08em;color:#6b5335}
-.card.big .kws{bottom:32px;font-size:10.5px}
-.card .type{position:absolute;bottom:5px;left:0;right:0;text-align:center;font-family:var(--mincho);
-  font-size:10px;letter-spacing:.3em;color:#6b5335}
+.card .type{flex:0 0 auto;font-family:var(--mincho);font-size:10px;letter-spacing:.3em;color:#6b5335}
+.card.big .type{font-size:12px}
 /* 折り返し（signature）*/
-.card .fold{position:absolute;right:0;bottom:0;width:30px;height:30px;z-index:4;
+.card .fold{position:absolute;right:0;bottom:0;width:26px;height:26px;z-index:4;
   clip-path:polygon(100% 0,100% 100%,0 100%);transition:.2s}
-.card.big .fold{width:40px;height:40px}
-.card:hover .fold{width:44px;height:44px}
+.card.big .fold{width:36px;height:36px}
+.card:hover .fold{width:38px;height:38px}
 .card.f-o{background:linear-gradient(168deg,#f2eadb,#d3c4a6 76%,#bda98a)}
 .card.f-u{background:linear-gradient(168deg,#dfe6ec,#b6c3cf 76%,#9aa9b8)}
 .card.f-o .glyph{background:radial-gradient(circle at 34% 26%,var(--shu-hi),var(--shu) 58%,#6d2118)}
@@ -174,7 +178,7 @@ body.in-battle #nav{display:none}
 .a-ka{background:rgba(176,132,20,.20);color:#6b5410}
 .a-tu{background:rgba(60,110,60,.18);color:#2c5730}
 /* 位（レアリティ）の見た目 */
-.rgem{position:absolute;top:33px;left:8px;font-family:var(--mincho);font-size:9.5px;font-weight:800;
+.rgem{position:absolute;top:30px;left:8px;font-family:var(--mincho);font-size:9.5px;font-weight:800;
   width:15px;height:15px;display:grid;place-items:center;border-radius:2px;color:#fff;z-index:3;
   box-shadow:0 1px 2px rgba(0,0,0,.4)}
 .card.big .rgem{top:44px;left:10px;width:19px;height:19px;font-size:12px}
@@ -188,8 +192,11 @@ body.in-battle #nav{display:none}
 @keyframes sheen{from{background-position:280% 0}to{background-position:-80% 0}}
 .raritybar{display:flex;gap:5px;flex-wrap:wrap;margin:8px 0 2px}
 .card.locked{filter:grayscale(1) brightness(.44);cursor:default}
-.card .own{position:absolute;top:34px;right:6px;font-family:var(--mincho);font-size:11px;font-weight:800;
-  color:#2b1f0a;background:rgba(255,255,255,.72);border:1px solid #8d7f66;border-radius:2px;padding:0 4px;z-index:3}
+.card .own{position:absolute;top:29px;right:6px;font-family:var(--mincho);font-size:11px;font-weight:800;
+  color:#2b1f0a;background:rgba(255,255,255,.78);border:1px solid #8d7f66;border-radius:2px;padding:0 4px;z-index:3}
+.card.cur{box-shadow:0 0 0 2px var(--kin-hi),0 6px 18px rgba(0,0,0,.6)}
+.facetag{font-family:var(--mincho);font-size:10px;letter-spacing:.24em;margin-top:6px;color:var(--gray)}
+.facetag.now{color:var(--kin-hi)}
 
 /* 3D反転 */
 .flipper{perspective:900px}
@@ -252,11 +259,13 @@ body.in-battle #nav{display:none}
 .unit.o .g{background:radial-gradient(circle at 34% 26%,var(--shu-hi),var(--shu) 60%,#6d2118)}
 .unit.u .g{background:radial-gradient(circle at 34% 26%,var(--ai-hi),var(--ai) 60%,#132c42)}
 .unit .n{font-family:var(--mincho);font-size:9.5px;font-weight:700;text-align:center;line-height:1.15;
-  max-width:100%;overflow:hidden}
+  max-width:100%;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;
+  word-break:break-all}
 .unit .s{font-family:var(--mincho);font-weight:800;font-size:13px;display:flex;gap:7px}
 .unit .s .a{color:#7d2418}.unit .s .h{color:#1d4462}
 .unit .s .h.hurt{color:#b5341f}
-.unit .k{position:absolute;top:2px;left:0;right:0;text-align:center;font-size:7.5px;letter-spacing:.06em;color:#6b5335}
+.unit .k{position:absolute;top:2px;left:3px;right:3px;text-align:center;font-size:7.5px;letter-spacing:.02em;
+  color:#6b5335;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .unit.ready{box-shadow:0 0 0 2px var(--kin-hi),0 0 14px rgba(239,215,155,.4)}
 .unit.frozen{filter:saturate(.35) brightness(1.12)}
 .unit.frozen::after{content:"凍";position:absolute;inset:0;display:grid;place-items:center;
@@ -274,15 +283,18 @@ body.in-battle #nav{display:none}
 
 /* 手札 */
 .hand{display:flex;gap:6px;overflow-x:auto;padding:8px 2px 4px;scrollbar-width:thin}
-.hand .card{width:96px;height:140px}
-.hand .card .glyph{width:46px;height:46px;font-size:25px}
-.hand .card .glyphwrap{top:28px}
-.hand .card .nm{top:78px;font-size:10.5px}
-.hand .card .rule{top:95px}
-.hand .card .tx{top:97px;font-size:8px;line-height:1.3;max-height:22px}
-.hand .card .stats{font-size:13px}
-.hand .card .kws{bottom:20px;font-size:7.5px}
-.hand .card .cost{width:22px;height:22px;font-size:13px}
+.hand .card{width:98px;height:142px;padding:24px 5px 5px}
+.hand .card .glyph{width:44px;height:44px;font-size:24px}
+.hand .card .cost{width:21px;height:21px;font-size:12.5px;top:4px;left:4px}
+.hand .card .asp{width:18px;height:18px;font-size:11px;top:5px;right:5px}
+.hand .card .rgem{top:24px;left:5px;width:13px;height:13px;font-size:8px}
+.hand .card .nm{font-size:10.5px;margin-top:3px}
+.hand .card .rule{margin:3px 0 2px}
+.hand .card .tx{font-size:8px;line-height:1.28;-webkit-line-clamp:2}
+.hand .card .kws{font-size:7.5px;margin-bottom:1px}
+.hand .card .stats{font-size:13px;gap:9px}
+.hand .card .type{font-size:9px}
+.hand .card .fold{width:20px;height:20px}
 .hand .card.no{opacity:.44}
 .hand .card.playable{box-shadow:0 0 0 1px var(--kin-hi),0 4px 14px rgba(0,0,0,.55)}
 .hand .card.chosen{transform:translateY(-8px)}
@@ -348,9 +360,11 @@ body.in-battle #nav{display:none}
   animation:tin .25s;white-space:nowrap;max-width:92vw;overflow:hidden;text-overflow:ellipsis}
 @keyframes tin{from{opacity:0;transform:translate(-50%,10px)}}
 @media (max-width:400px){
-  .card{width:112px;height:164px}
-  .hand .card{width:88px;height:130px}
-  .card .nm{top:92px;font-size:11.5px}.card .rule{top:112px}.card .tx{top:118px}
+  .card{width:114px;height:170px;padding:29px 6px 5px}
+  .card .glyph{width:52px;height:52px;font-size:29px}
+  .card .nm{font-size:11.5px}
+  .hand .card{width:90px;height:132px;padding:22px 4px 4px}
+  .hand .card .glyph{width:40px;height:40px;font-size:22px}
 }
 /* ── 起動画面 ── */
 #boot{position:fixed;inset:0;z-index:500;background:var(--sumi);display:grid;place-content:center;
@@ -1069,6 +1083,21 @@ const GATES = [
   fl:'この盤の主。神の札を惜しみなく切ってくる。'}
 ];
 
+/* ============ 無明の間（十二門を全て突破すると開く） ============ */
+const MUMEI_NAMES=['無名の指し手','影の門番','名を捨てた者','面打ちの亡霊','裏返しの化身',
+  '両面の修羅','忘れられた主','鏡合わせの敵手'];
+function allCleared(){ for(let i=0;i<GATES.length;i++){ if(!S.gates[i]) return false; } return true; }
+function endlessGate(streak){
+  const pairs=[];
+  for(let i=0;i<ASPLIST.length;i++) for(let j=i+1;j<ASPLIST.length;j++) pairs.push([ASPLIST[i],ASPLIST[j]]);
+  const asp=pick(pairs);
+  return {no:'無', nm:'無明の間', endless:1,
+    who:pick(MUMEI_NAMES)+'・'+asp.map(a=>ASP[a].n).join('＋'),
+    asp, pow:6, ai:(streak>=2?9:5),
+    life:20+Math.min(streak*2,20),
+    fl:'連勝2からは二手先まで読んでくる。'};
+}
+
 /* ============ 保存 ============ */
 const KEY='uraomote.save.v2';
 let MEM=null;
@@ -1519,8 +1548,14 @@ let SIM=false;
 const KWV={'速攻':1.1,'貫通':1.0,'盾':1.3,'重盾':2.2,'反射':1.1,'吸命':1.2,'幻':1.7,'再起':2.8,
   '二面':0.7,'連撃':2.2,'遠当':1.5,'毒手':2.3,'成長':1.9,'余波':1.0,'不屈':0.5,'結界':1.6};
 
-function snap(){ return JSON.stringify({p:B.p,cur:B.cur,turn:B.turn,over:B.over,winner:B.winner}); }
-function restore(j){ const o=JSON.parse(j); B.p=o.p; B.cur=o.cur; B.turn=o.turn; B.over=o.over; B.winner=o.winner; }
+function cloneUnit(u){ return {uid:u.uid,cid:u.cid,face:u.face,dmg:u.dmg,ab:u.ab,hb:u.hb,
+  kw:u.kw.slice(),ready:u.ready,frozen:u.frozen,ghost:u.ghost,reborn:u.reborn,side:u.side,lane:u.lane}; }
+function cloneSide(P){ return {life:P.life,maxlife:P.maxlife,ki:P.ki,kiMax:P.kiMax,
+  deck:P.deck.slice(),hand:P.hand.map(c=>({cid:c.cid,uid:c.uid})),
+  lanes:P.lanes.map(u=>u?cloneUnit(u):null),dead:P.dead.slice(),
+  sorei:P.sorei,soreiUsed:P.soreiUsed,buried:P.buried,moves:P.moves,fatigue:P.fatigue}; }
+function snap(){ return {p:[cloneSide(B.p[0]),cloneSide(B.p[1])],cur:B.cur,turn:B.turn,over:B.over,winner:B.winner}; }
+function restore(o){ B.p=[cloneSide(o.p[0]),cloneSide(o.p[1])]; B.cur=o.cur; B.turn=o.turn; B.over=o.over; B.winner=o.winner; }
 
 function unitScore(u){
   let v=atkOf(u)*1.05 + hpOf(u)*1.0;
@@ -1602,9 +1637,52 @@ function bestAction(s,noise){
   return best;
 }
 
-/* 難度：1=甘い 〜 5=本気 */
+/* ── 2手先読み：自分の一手のあと、相手の返しまで見て選ぶ ── */
+function simFoeTurn(foe,cap){
+  const P=B.p[foe];
+  if(!P.buried&&P.kiMax<8&&P.hand.length>1){
+    let bi=0,bv=1e9;
+    P.hand.forEach((c,i)=>{ const v=cardPower(BYID[c.cid]); if(v<bv){bv=v;bi=i;} });
+    bury(foe,bi);
+  }
+  for(let i=0;i<(cap||6)&&!B.over;i++){ const a=bestAction(foe,0); if(!a) break; applyAction(foe,a); }
+}
+function lookahead(s,a,keep){
+  let v=-9999;
+  try{
+    if(a) applyAction(s,a);
+    if(!B.over){ endTurn(); simFoeTurn(other(s),8); if(!B.over&&B.cur!==s) endTurn(); }
+    v=evalBoard(s);
+  }catch(e){}
+  restore(keep);
+  return v;
+}
+function bestAction2(s){
+  const list=actions(s); if(!list.length) return null;
+  const keep=snap();
+  SIM=true;
+  const base=evalBoard(s)*0.3 + lookahead(s,null,keep)*0.7 + 0.08;
+  const scored=[];
+  for(const a of list){
+    let v=-9999;
+    try{ applyAction(s,a); v=evalBoard(s); }catch(e){}
+    restore(keep);
+    scored.push({a,v});
+  }
+  scored.sort((x,y)=>y.v-x.v);
+  let best=null, bv=base;
+  for(const c of scored.slice(0,10)){
+    const v=c.v*0.3 + lookahead(s,c.a,keep)*0.7;
+    if(v>bv){ bv=v; best=c.a; }
+  }
+  SIM=false; restore(keep);
+  return best;
+}
+
+/* 難度：1=甘い 〜 5=本気、9=2手先読み */
 const MISS=[0.46,0.33,0.20,0.09,0.0];
 function aiChoose(s,diff){
+  if(diff>=9) return bestAction2(s);
   const list=actions(s); if(!list.length) return null;
   const m=MISS[Math.max(0,Math.min(4,(diff||3)-1))];
   if(Math.random()<m){ if(Math.random()<0.34) return null; return pick(list); }
@@ -1706,60 +1784,109 @@ function bell(bus,freq,t,vel,dur){
   });
 }
 
-/* ── 音階：都節（0,1,5,7,8） ── */
-const SCALE=[0,1,5,7,8];
-const ROOTS=[0,0,-2,-4];
-function ntf(deg,oct,root){ // 度数→周波数（D3=146.83Hz基準）
-  const s=SCALE[((deg%5)+5)%5]+12*(oct+Math.floor(deg/5));
-  return 146.83*Math.pow(2,(s+root)/12);
+/* ── 音階：陽旋法（明るい）と陰旋法＝都節（張り詰めた） ── */
+const SC_YO=[0,2,5,7,9], SC_IN=[0,1,5,7,8];
+const BASE=146.83; /* D3 */
+function ntf(deg,oct,sc){
+  const n=((deg%5)+5)%5, o=oct+Math.floor(deg/5);
+  return BASE*Math.pow(2,((sc||SC_IN)[n]+12*o)/12);
+}
+/* ── 楽句（度数,長さ）各1小節＝8分音符8つぶん ── */
+const PHR=[
+  [[0,2],[1,1],[2,1],[1,2],[0,2]],
+  [[2,1],[3,1],[4,3],[3,1],[2,2]],
+  [[4,2],[2,1],[1,1],[0,4]],
+  [[0,1],[2,1],[4,2],[3,1],[2,1],[1,2]],
+  [[3,2],[4,1],[3,1],[2,2],[0,2]],
+  [[0,4],[2,2],[1,2]],
+  [[2,2],[1,2],[0,2],[-1,2]],
+  [[4,1],[3,1],[2,2],[1,1],[0,3]],
+  [[1,2],[2,2],[4,4]],
+  [[-1,1],[0,1],[2,2],[1,3],[0,1]]
+];
+const PROG=[0,0,3,2];                                  /* 4小節の根音 */
+const TAIKO=[1,0,0,.45, 1,.5,0,.4, 0,1,0,0, .9,0,.5,.55]; /* 2小節ぶんの太鼓 */
+
+/* ── 音色を足す ── */
+function pad(bus,freqs,t,dur,vel){
+  const x=AUD.ctx;
+  const lp=x.createBiquadFilter(); lp.type='lowpass';
+  lp.frequency.setValueAtTime(620,t); lp.frequency.linearRampToValueAtTime(1050,t+dur*0.5);
+  const g=x.createGain();
+  g.gain.setValueAtTime(0.0001,t);
+  g.gain.linearRampToValueAtTime(vel,t+dur*0.38);
+  g.gain.linearRampToValueAtTime(0.0001,t+dur);
+  freqs.forEach((f,i)=>{
+    const o=x.createOscillator(); o.type='sawtooth'; o.frequency.value=f*(i===1?1.004:1);
+    const og=x.createGain(); og.gain.value=0.11/(i*0.7+1);
+    o.connect(og); og.connect(lp); o.start(t); o.stop(t+dur+0.12);
+  });
+  lp.connect(g); g.connect(bus);
+}
+function flute(bus,freq,t,vel,dur){
+  const x=AUD.ctx;
+  const o=x.createOscillator(), g=x.createGain(), lfo=x.createOscillator(), lg=x.createGain();
+  o.type='sine'; o.frequency.value=freq;
+  lfo.type='sine'; lfo.frequency.value=5.0; lg.gain.value=freq*0.007;
+  lfo.connect(lg); lg.connect(o.frequency);
+  g.gain.setValueAtTime(0.0001,t);
+  g.gain.exponentialRampToValueAtTime(vel,t+0.11);
+  g.gain.setValueAtTime(vel,t+dur*0.62);
+  g.gain.exponentialRampToValueAtTime(0.0001,t+dur);
+  o.connect(g); g.connect(bus);
+  o.start(t); o.stop(t+dur+0.06); lfo.start(t); lfo.stop(t+dur+0.06);
+  hiss(bus,t,vel*0.12,2000,0.12,'bandpass');
 }
 
-/* ── 曲の進行 ── */
+/* ── 曲 ── */
 const TRACKS={
-  shizu:{bpm:58,taiko:0,mel:0.40,bass:0.55,gain:0.30},
-  ikusa:{bpm:84,taiko:1,mel:0.58,bass:0.85,gain:0.36}
+  shizu:{bpm:64,scale:SC_YO,rest:0.30,taiko:0,pad:0.11,bass:0.24,flute:1,gain:0.30},
+  ikusa:{bpm:88,scale:SC_IN,rest:0.12,taiko:1,pad:0.09,bass:0.40,flute:0,gain:0.33}
 };
-let MEL={deg:4,oct:0};
 function schedule(){
   if(!AUD.ctx||!AUD.track) return;
-  const x=AUD.ctx, T=TRACKS[AUD.track], spb=60/T.bpm, st=spb/2; // 8分音符
-  while(AUD.next < x.currentTime+0.6){
-    const t=AUD.next, s=AUD.step, bar=Math.floor(s/8), beat=(s%8)/2;
-    const root=ROOTS[bar%ROOTS.length];
-    if(s%8===0){
-      // 低音と持続音
-      pluck(AUD.musBus,ntf(0,-1,root),t,T.bass*0.5,3.2,2);
-      const o=x.createOscillator(), g=x.createGain();
-      o.type='sine'; o.frequency.value=ntf(0,-2,root);
-      g.gain.setValueAtTime(0.0001,t);
-      g.gain.linearRampToValueAtTime(0.10,t+0.6);
-      g.gain.linearRampToValueAtTime(0.0001,t+spb*4);
-      o.connect(g); g.connect(AUD.musBus); o.start(t); o.stop(t+spb*4+0.1);
+  const x=AUD.ctx, T=TRACKS[AUD.track], sc=T.scale, spb=60/T.bpm, st=spb/2;
+  while(AUD.next < x.currentTime+0.7){
+    const t=AUD.next, s=AUD.step, pos=s%8, bar=Math.floor(s/8), root=PROG[bar%4];
+    if(pos===0){
+      if(bar%2===0) AUD.ph = (Math.random()<T.rest) ? null : PHR[(Math.random()*PHR.length)|0];
+      pad(AUD.musBus,[ntf(root,0,sc),ntf(root+2,0,sc),ntf(root+4,0,sc)],t,spb*4*0.96,T.pad);
+      pluck(AUD.musBus,ntf(root,-1,sc),t,T.bass,2.6,2);
     }
+    if(pos===4&&T.taiko) pluck(AUD.musBus,ntf(root+2,-1,sc),t,T.bass*0.55,1.7,2);
     if(T.taiko){
-      if(s%8===0) taiko(AUD.musBus,t,0.5);
-      else if(s%8===3) taiko(AUD.musBus,t,0.26);
-      else if(s%8===6) taiko(AUD.musBus,t,0.34);
-      if(s%2===1&&Math.random()<0.3) hiss(AUD.musBus,t,0.05,5200,0.05);
+      const v=TAIKO[s%16];
+      if(v>0) taiko(AUD.musBus,t,0.22+v*0.32);
+      if(pos%2===1) hiss(AUD.musBus,t,0.035,6200,0.045);
     }
-    if(Math.random()<T.mel){
-      const jump=Math.random();
-      MEL.deg += jump<0.5 ? (Math.random()<0.5?1:-1) : (jump<0.8?2:-2);
-      if(MEL.deg>9){ MEL.deg-=5; } if(MEL.deg<-2){ MEL.deg+=5; }
-      const accent = (s%8===0||s%8===4);
-      pluck(AUD.musBus,ntf(MEL.deg,1,root),t,accent?0.30:0.18,accent?1.6:1.0,6);
+    if(AUD.ph){
+      let acc=0;
+      for(let i=0;i<AUD.ph.length;i++){
+        const deg=AUD.ph[i][0], len=AUD.ph[i][1];
+        if(acc===pos){
+          const f=ntf(deg+root,1,sc), head=(pos===0);
+          if(len>=3&&T.flute) flute(AUD.musBus,f,t,0.17,st*len*0.95);
+          else pluck(AUD.musBus,f,t,head?0.30:0.19,st*len*1.7,6);
+          if(head&&Math.random()<0.45) pluck(AUD.musBus,ntf(deg+root,2,sc),t+0.025,0.085,1.0,8);
+        }
+        acc+=len;
+      }
     }
-    if(s%32===24&&Math.random()<0.6) bell(AUD.musBus,ntf(0,2,root),t,0.16,2.4);
+    if(bar%8===7&&pos===6) bell(AUD.musBus,ntf(0,2,sc),t,0.13,2.6);
     AUD.next+=st; AUD.step++;
   }
 }
 function musicPlay(track){
-  if(!AUD.musOn||!audioReady()) { AUD.track=track; return; }
+  if(!AUD.musOn||!audioReady()){ AUD.track=track; return; }
   audioResume();
-  if(AUD.track===track&&AUD.timer) return;
-  AUD.track=track;
+  if(AUD.track!==track){
+    AUD.track=track;
+    AUD.step=Math.ceil(AUD.step/8)*8;   /* 小節の頭で切り替える */
+    AUD.musBus.gain.setTargetAtTime(TRACKS[track].gain,AUD.ctx.currentTime,0.5);
+  }
   if(!AUD.timer){
-    AUD.next=AUD.ctx.currentTime+0.1; AUD.step=0;
+    AUD.next=AUD.ctx.currentTime+0.12; AUD.step=0; AUD.ph=null;
+    AUD.musBus.gain.value=TRACKS[track].gain;
     AUD.timer=setInterval(schedule,120);
     schedule();
   }
@@ -1767,8 +1894,8 @@ function musicPlay(track){
 function musicStop(){ if(AUD.timer){ clearInterval(AUD.timer); AUD.timer=null; } AUD.track=null; }
 function musicToggle(){
   AUD.musOn=!AUD.musOn;
-  if(audioReady()) AUD.musBus.gain.value=AUD.musOn?TRACKS[AUD.track||'shizu'].gain:0;
-  if(AUD.musOn){ musicPlay(AUD.track||(CUR==='battle'?'ikusa':'shizu')); } else musicStop();
+  if(AUD.musOn) musicPlay(CUR==='battle'?'ikusa':'shizu');
+  else { musicStop(); if(AUD.ctx) AUD.musBus.gain.value=0; }
   if(typeof S!=='undefined'&&S){ S.mus=AUD.musOn?1:0; save(); }
   drawSoundBtn();
   return AUD.musOn;
@@ -1786,26 +1913,26 @@ function sfx(kind){
   if(typeof SIM!=='undefined'&&SIM) return;
   if(!AUD.on||!audioReady()) return;
   audioResume();
-  const x=AUD.ctx, t=x.currentTime+0.005, B2=AUD.sfxBus;
+  const x=AUD.ctx, t=x.currentTime+0.005, B2=AUD.sfxBus, sc=SC_IN;
   switch(kind){
-    case 'card':  pluck(B2,ntf(2,1,0),t,0.30,0.7,7); pluck(B2,ntf(4,1,0),t+0.045,0.22,0.6,7); break;
+    case 'card':  pluck(B2,ntf(2,1,sc),t,0.28,0.7,7); pluck(B2,ntf(4,1,sc),t+0.05,0.20,0.6,7); break;
     case 'flip':  { const o=x.createOscillator(), g=x.createGain();
         o.type='triangle'; o.frequency.setValueAtTime(320,t);
         o.frequency.exponentialRampToValueAtTime(900,t+0.13);
         o.frequency.exponentialRampToValueAtTime(380,t+0.28);
-        g.gain.setValueAtTime(0.24,t); g.gain.exponentialRampToValueAtTime(0.0001,t+0.3);
+        g.gain.setValueAtTime(0.22,t); g.gain.exponentialRampToValueAtTime(0.0001,t+0.3);
         o.connect(g); g.connect(B2); o.start(t); o.stop(t+0.32);
-        hiss(B2,t,0.14,3200,0.14); break; }
-    case 'atk':   taiko(B2,t,0.6); hiss(B2,t+0.01,0.24,2400,0.13); break;
-    case 'hit':   taiko(B2,t,0.34); break;
-    case 'die':   { [0,-2,-4].forEach((d,i)=>pluck(B2,ntf(d,0,0),t+i*0.06,0.24,0.55,3)); break; }
-    case 'draw':  hiss(B2,t,0.10,5200,0.06); break;
-    case 'ki':    bell(B2,ntf(0,1,0),t,0.16,1.0); break;
-    case 'sorei': bell(B2,ntf(2,1,0),t,0.24,1.9); break;
-    case 'win':   [0,2,4,7].forEach((d,i)=>pluck(B2,ntf(d,1,0),t+i*0.13,0.34,1.7,7));
-                  bell(B2,ntf(0,2,0),t+0.5,0.3,2.6); break;
-    case 'lose':  [4,2,0,-3].forEach((d,i)=>pluck(B2,ntf(d,0,0),t+i*0.17,0.3,1.5,3)); break;
-    case 'gate':  taiko(B2,t,0.7); taiko(B2,t+0.22,0.5); bell(B2,ntf(0,1,0),t+0.3,0.22,2.2); break;
+        hiss(B2,t,0.13,3200,0.14); break; }
+    case 'atk':   taiko(B2,t,0.58); hiss(B2,t+0.01,0.22,2400,0.13); break;
+    case 'hit':   taiko(B2,t,0.32); break;
+    case 'die':   [0,-2,-4].forEach((d,i)=>pluck(B2,ntf(d,0,sc),t+i*0.06,0.22,0.55,3)); break;
+    case 'draw':  hiss(B2,t,0.09,5200,0.06); break;
+    case 'ki':    bell(B2,ntf(0,1,sc),t,0.15,1.0); break;
+    case 'sorei': bell(B2,ntf(2,1,sc),t,0.22,1.9); break;
+    case 'win':   [0,2,4,7].forEach((d,i)=>pluck(B2,ntf(d,1,SC_YO),t+i*0.14,0.32,1.7,7));
+                  bell(B2,ntf(0,2,SC_YO),t+0.56,0.28,2.6); break;
+    case 'lose':  [4,2,0,-3].forEach((d,i)=>pluck(B2,ntf(d,0,sc),t+i*0.18,0.28,1.5,3)); break;
+    case 'gate':  taiko(B2,t,0.68); taiko(B2,t+0.22,0.48); bell(B2,ntf(0,1,sc),t+0.3,0.20,2.2); break;
     case 'tap':   hiss(B2,t,0.07,4200,0.04); break;
   }
 }
@@ -1936,6 +2063,7 @@ async function netJoin(code){
 /* ============ 画面 ============ */
 const $=id=>document.getElementById(id);
 let CUR='title', CURGATE=0;
+let GNOW=null;
 let MODE='solo';      /* solo=門 / hot=同じ端末で交互 / net=二台をつなぐ */
 let ME=0;             /* 自分がどちら側か */
 let HIDE=false;       /* 手渡し中は手札を伏せる */
@@ -2000,15 +2128,20 @@ function cardHTML(C,face,o){
     <div class="fold"></div></div>`;
 }
 function backHTML(){ return `<div class="card back"><div class="edge"></div><div class="bk">裏</div></div>`; }
+function bothFaces(C,cur,big){
+  return `<div class="faces">`+['o','u'].map(f=>
+    `<div class="faceopt ${f}">
+       <div class="tagl">${f==='o'?'表':'裏'}</div>
+       ${cardHTML(C,f,{big:big?1:0,cls:cur===f?'cur':''})}
+       ${cur?`<div class="facetag ${cur===f?'now':''}">${cur===f?'今この面':'裏の顔'}</div>`:''}
+     </div>`).join('')+`</div>`;
+}
 function cardDetail(C){
   const A=ASP[C.asp];
   const kwall=[].concat(C.o.kw||[],C.u.kw||[]).filter((v,i,a)=>a.indexOf(v)===i);
   sheet(`<h3>${esc(C.nm)}</h3>
    <div class="crumb">${A.n}の相 ／ ${C.rar} ／ 同名は${copyCap(C)}枚まで</div>
-   <div class="faces">
-     <div class="faceopt o"><div class="tagl">表</div>${cardHTML(C,'o',{big:1})}</div>
-     <div class="faceopt u"><div class="tagl">裏</div>${cardHTML(C,'u',{big:1})}</div>
-   </div>
+   ${bothFaces(C,null,1)}
    ${kwall.length?`<div style="margin-top:14px">${kwall.map(k=>`<p class="muted" style="margin:2px 0"><span class="kw">${k}</span>${KWTX[k]||''}</p>`).join('')}</div>`:''}
    <button class="btn wide ghost" style="margin-top:12px" onclick="closeSheet()">閉じる</button>`);
 }
@@ -2043,14 +2176,38 @@ function drawGates(){
       <p class="muted" style="margin:4px 0 0">気は自然には増えません。自分の手番でまず<b style="color:var(--kin-hi)">手札を1枚「気脈に伏せる」</b>ところから始めます。伏せた枚数＝使える気です。</p>
       <button class="btn sm" style="margin-top:8px" onclick="go('rules')">掟をひととおり読む</button></div>`}
     ${rows}
-    <p class="muted" style="margin-top:14px">突破済みの門には何度でも挑めます。勝てば魂片40、負けても12。</p>`;
+    <p class="muted" style="margin-top:14px">突破済みの門には何度でも挑めます。勝てば魂片40、負けても12。</p>
+    ${allCleared()?`
+      <div class="sec"><h3>無明の間</h3><div class="ln"></div></div>
+      <div class="panel" style="border-color:var(--shu)">
+        <p class="muted" style="margin:0 0 8px">十二門の先。相手は毎回変わり、<b style="color:#e8674f">二手先まで読んでくる</b>。
+          勝つほど相手の命が増える。負ければ連勝は0に戻る。</p>
+        <div style="display:flex;gap:14px;align-items:baseline;margin-bottom:10px">
+          <div><span class="crumb">連勝</span>
+            <span style="font-family:var(--mincho);font-size:26px;font-weight:800;color:var(--kin-hi)"> ${S.streak||0}</span></div>
+          <div><span class="crumb">最高</span>
+            <span style="font-family:var(--mincho);font-size:18px;font-weight:800;color:var(--kin)"> ${S.best||0}</span></div>
+          <div class="spacer"></div>
+          <div class="muted">相手の命 ${24+Math.min((S.streak||0)*2,18)}</div>
+        </div>
+        <button class="btn wide solid" onclick="startEndless()">無明の間へ入る</button>
+      </div>`:`
+      <div class="sec"><h3>この先</h3><div class="ln"></div></div>
+      <p class="muted">十二門を全て突破すると<b>無明の間</b>が開きます。二手先を読む相手と、何連勝できるかを競う場です。</p>`}`;
 }
 function startGate(i){
   const d=ensureDeck(); if(!deckOK(d)) return toast('組札を30枚にしてください');
-  MODE='solo'; ME=0; HIDE=false; CURGATE=i; clearUI();
-  startBattle(GATES[i],d); go('battle'); render(); sfx('gate');
+  MODE='solo'; ME=0; HIDE=false; CURGATE=i; GNOW=GATES[i]; clearUI();
+  startBattle(GNOW,d); go('battle'); render(); sfx('gate');
 }
 function clearUI(){ UI.mode=null; UI.card=null; UI.unit=null; }
+function startEndless(){
+  const d=ensureDeck(); if(!deckOK(d)) return toast('組札を30枚にしてください');
+  MODE='solo'; ME=0; HIDE=false; CURGATE=-1; clearUI();
+  GNOW=endlessGate(S.streak||0);
+  startBattle(GNOW,d); go('battle'); render(); sfx('gate');
+  toast(GNOW.who+'が現れた');
+}
 
 /* ============ 対人戦 ============ */
 function myName(){ return (S.name||'あなた').slice(0,10); }
@@ -2511,8 +2668,8 @@ function tapHand(i){
   sheet(`<h3 style="text-align:center">${esc(C.nm)}</h3>
     <div class="crumb" style="text-align:center">${ASP[C.asp].n}の相・どちらの顔で出す？</div>
     <div class="faces">
-      <div class="faceopt o" style="flex:1;min-width:132px"><div class="tagl">表</div>${cardHTML(C,'o')}${btn('o')}</div>
-      <div class="faceopt u" style="flex:1;min-width:132px"><div class="tagl">裏</div>${cardHTML(C,'u')}${btn('u')}</div>
+      <div class="faceopt o" style="flex:1;min-width:134px"><div class="tagl">表</div>${cardHTML(C,'o')}${btn('o')}</div>
+      <div class="faceopt u" style="flex:1;min-width:134px"><div class="tagl">裏</div>${cardHTML(C,'u')}${btn('u')}</div>
     </div>
     <div style="display:flex;gap:8px;margin-top:14px">
       <button class="btn sm ghost" style="flex:1" ${me.buried||me.kiMax>=10?'disabled':''} onclick="doBury(${i})">気脈に伏せる（気+1）</button>
@@ -2554,8 +2711,8 @@ function tapUnit(s,l){
   const front=B.p[FOE()].lanes[l];
   sheet(`<h3 style="text-align:center">${esc(faceOf(u).n)}</h3>
     <div class="crumb" style="text-align:center">${laneName(u.lane)}・力${atkOf(u)}／耐${hpOf(u)}</div>
-    <div style="display:grid;place-items:center;margin:12px 0">${cardHTML(BYID[u.cid],u.face,{big:1})}</div>
-    <p class="muted" style="text-align:center;margin:0 0 10px">${tf
+    ${bothFaces(BYID[u.cid],u.face)}
+    <p class="muted" style="text-align:center;margin:10px 0">${tf
       ? '反転すると「'+esc(oth.n)+'」（力'+oth.a+'／耐'+oth.h+'）になる。受けた傷'+u.dmg+'はそのまま引き継ぐ。'
       : 'この札は自分からは反転できない（二面を持つ札か、反転させる術が必要）。'}</p>
     <button class="btn wide solid" ${canAtk?'':'disabled'} onclick="doAtk(${l})">
@@ -2569,10 +2726,10 @@ function tapUnit(s,l){
 function unitInfo(u){
   sheet(`<h3 style="text-align:center">${esc(faceOf(u).n)}</h3>
     <div class="crumb" style="text-align:center">力${atkOf(u)}／耐${hpOf(u)}／${u.frozen?'凍結中':'健在'}${hasKw(u,'結界')?'／結界':''}</div>
-    <div class="faces">
-      <div class="faceopt o"><div class="tagl">表</div>${cardHTML(BYID[u.cid],'o',{big:1})}</div>
-      <div class="faceopt u"><div class="tagl">裏</div>${cardHTML(BYID[u.cid],'u',{big:1})}</div>
-    </div>
+    ${bothFaces(BYID[u.cid],u.face)}
+    <p class="muted" style="text-align:center;margin:10px 0 0">${twoFace(u)
+      ? '二面：1気で自分から反転できる。'
+      : '反転させるには術か、反転させる効果を持つ札が要る。'}受けた傷${u.dmg}は反転しても残る。</p>
     <button class="btn wide ghost" style="margin-top:12px" onclick="closeSheet()">閉じる</button>`);
 }
 function doAtk(l){ closeSheet(); attack(B.p[ME].lanes[l]); after(); }
@@ -2592,7 +2749,7 @@ async function tapEnd(){
   else netPush();
 }
 async function aiTurn(){
-  const g=GATES[CURGATE];
+  const g=GNOW||GATES[CURGATE]||{ai:3};
   await wait(340);
   if(aiBury()){ render(); await wait(340); }
   for(let step=0;step<16&&!B.over;step++){
@@ -2618,6 +2775,30 @@ function showResult(){
       <div style="display:flex;gap:8px;margin-top:16px">
         ${again?`<button class="btn sm" style="flex:1" onclick="rematch()">もう一度</button>`:''}
         <button class="btn sm solid" style="flex:1" onclick="leaveVersus()">終わる</button>
+      </div></div>`);
+    return;
+  }
+  if(GNOW&&GNOW.endless){
+    const st=S.streak||0;
+    let souls, bonus='';
+    if(win){
+      S.streak=st+1; S.best=Math.max(S.best||0,S.streak);
+      souls=60+S.streak*15;
+      if(S.streak%3===0){ const c=grantRare('極');
+        if(c) bonus=`<p class="muted">${S.streak}連勝の証として <b style="color:${RAR[c.rar].c}">${esc(c.nm)}</b>（${c.rar}）を授かった。</p>`; }
+    }else{ S.streak=0; souls=15; }
+    S.souls+=souls; S.plays++; if(win) S.wins++;
+    save();
+    sheet(`<div class="result">
+      <div class="crumb">無明の間・${esc(GNOW.who)}</div>
+      <div class="big ${win?'win':'lose'}">${win?'勝':'負'}</div>
+      <p class="muted">${win?`これで<b style="color:var(--kin-hi)">${S.streak}連勝</b>。次の相手はさらに手強い。`
+        :`ここで途切れた。最高記録は${S.best||0}連勝。`}</p>
+      ${bonus}
+      <div class="coin" style="display:inline-block;margin:10px 0">魂片 +${souls}</div>
+      <div style="display:flex;gap:8px;margin-top:12px">
+        <button class="btn sm" style="flex:1" onclick="closeSheet();startEndless()">次の相手</button>
+        <button class="btn sm solid" style="flex:1" onclick="closeSheet();go('gates')">戻る</button>
       </div></div>`);
     return;
   }
