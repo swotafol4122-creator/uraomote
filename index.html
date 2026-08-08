@@ -1521,11 +1521,11 @@ function startVersus(dA,dB,nameA,nameB){
   beginTurn(0);
 }
 function fullSnap(){
-  return {p:B.p,cur:B.cur,turn:B.turn,over:B.over,winner:B.winner,
+  return {p:B.p,cur:B.cur,turn:B.turn,over:B.over,winner:B.winner,resigned:B.resigned,
     gate:B.gate,names:B.names,log:B.log.slice(-8),versus:1,uid:UID};
 }
 function fullRestore(o){
-  B={p:o.p,cur:o.cur,turn:o.turn,over:o.over,winner:o.winner,
+  B={p:o.p,cur:o.cur,turn:o.turn,over:o.over,winner:o.winner,resigned:o.resigned,
      gate:o.gate,names:o.names,log:o.log||[],versus:1};
   UID=Math.max(UID,o.uid||1);
 }
@@ -2630,7 +2630,7 @@ function render(){
    </div>
    <div class="hand">${handHTML()}</div>
    <div class="battlebar">
-     <button class="sndsm ${AUD.musOn||AUD.on?'on':''}" onclick="soundSheet()" title="音">♪</button>
+     <button class="sndsm on" onclick="battleMenu()" title="メニュー（音・降参）">≡</button>
      <div class="log">${B.log.slice(-2).map(esc).join('<br>')}</div>
      ${UI.mode?'<button class="btn sm ghost" onclick="cancelMode()">取り消し</button>':
        `<button class="btn sm ${me.buried||me.kiMax>=10||!mt?'ghost':''}" ${me.buried||me.kiMax>=10||!mt?'disabled':''} onclick="tapBury()">気脈に伏せる</button>`}
@@ -2761,6 +2761,44 @@ async function aiTurn(){
   if(!B.over){ endTurn(); render(); }
 }
 
+/* ── 対戦中のメニューと降参 ── */
+function battleMenu(){
+  const endless=GNOW&&GNOW.endless;
+  sheet(`<h3>対戦中</h3><div class="crumb">${MODE==='solo'?(endless?'無明の間':'盤上十二門'):'対人戦'}・${B?B.turn:1}巡目</div>
+    <div style="display:flex;gap:8px;margin-top:14px">
+      <button class="btn" style="flex:1" onclick="musicToggle();battleMenu()">曲：${AUD.musOn?'入':'切'}</button>
+      <button class="btn" style="flex:1" onclick="soundToggle();battleMenu()">効果音：${AUD.on?'入':'切'}</button>
+    </div>
+    <button class="btn wide" style="margin-top:16px;border-color:var(--shu);color:#f3c0b5;
+      background:linear-gradient(180deg,rgba(196,64,47,.24),rgba(196,64,47,.06))"
+      ${B&&!B.over?'':'disabled'} onclick="askResign()">降参する</button>
+    <button class="btn wide ghost" style="margin-top:10px" onclick="closeSheet()">盤に戻る</button>`);
+}
+function askResign(){
+  const endless=GNOW&&GNOW.endless;
+  const msg = MODE==='solo'
+    ? (endless
+        ? `この対局は負けになり、<b style="color:#e8674f">連勝${S.streak||0}が0に戻ります</b>。魂片ももらえません。`
+        : 'この対局は負けになります。魂片はもらえません。門の突破記録は消えません。')
+    : `${esc(sideName(FOE()))}の勝ちになります。`;
+  sheet(`<h3>降参しますか？</h3><p class="muted">${msg}</p>
+    <div style="display:flex;gap:8px;margin-top:18px">
+      <button class="btn sm ghost" style="flex:1" onclick="battleMenu()">やめておく</button>
+      <button class="btn sm solid" style="flex:1" onclick="doResign()">降参する</button>
+    </div>`);
+}
+function doResign(){
+  closeSheet();
+  if(!B||B.over) return;
+  clearUI();
+  B.resigned=ME;
+  B.p[ME].life=0;
+  B.over=true; B.winner=FOE();
+  logM((MODE==='solo'?'自分':sideName(ME))+'が降参した');
+  if(MODE==='net') netPush();
+  render();
+}
+
 /* ── 決着 ── */
 function showResult(){
   if(!B||!B.over||B.shown) return; B.shown=true;
@@ -2770,8 +2808,8 @@ function showResult(){
     const again = MODE==='hot' || NET.role==='host';
     sheet(`<div class="result">
       <div class="crumb">${MODE==='hot'?'同じ端末で交互に':'二台をつないで'}・対人戦</div>
-      <div class="big ${win?'win':'lose'}">${win?'勝':'負'}</div>
-      <p class="muted">${esc(sideName(B.winner))}の勝ち。</p>
+      <div class="big ${win?'win':'lose'}">${win?'勝':(B.resigned===ME?'投':'負')}</div>
+      <p class="muted">${B.resigned!=null?esc(sideName(B.resigned))+'が降参。':''}${esc(sideName(B.winner))}の勝ち。</p>
       <div style="display:flex;gap:8px;margin-top:16px">
         ${again?`<button class="btn sm" style="flex:1" onclick="rematch()">もう一度</button>`:''}
         <button class="btn sm solid" style="flex:1" onclick="leaveVersus()">終わる</button>
@@ -2786,14 +2824,14 @@ function showResult(){
       souls=60+S.streak*15;
       if(S.streak%3===0){ const c=grantRare('極');
         if(c) bonus=`<p class="muted">${S.streak}連勝の証として <b style="color:${RAR[c.rar].c}">${esc(c.nm)}</b>（${c.rar}）を授かった。</p>`; }
-    }else{ S.streak=0; souls=15; }
+    }else{ S.streak=0; souls=(B.resigned!=null?0:15); }
     S.souls+=souls; S.plays++; if(win) S.wins++;
     save();
     sheet(`<div class="result">
       <div class="crumb">無明の間・${esc(GNOW.who)}</div>
-      <div class="big ${win?'win':'lose'}">${win?'勝':'負'}</div>
+      <div class="big ${win?'win':'lose'}">${win?'勝':(B.resigned!=null?'投':'負')}</div>
       <p class="muted">${win?`これで<b style="color:var(--kin-hi)">${S.streak}連勝</b>。次の相手はさらに手強い。`
-        :`ここで途切れた。最高記録は${S.best||0}連勝。`}</p>
+        :(B.resigned!=null?`降参した。最高記録は${S.best||0}連勝。`:`ここで途切れた。最高記録は${S.best||0}連勝。`)}</p>
       ${bonus}
       <div class="coin" style="display:inline-block;margin:10px 0">魂片 +${souls}</div>
       <div style="display:flex;gap:8px;margin-top:12px">
@@ -2803,7 +2841,7 @@ function showResult(){
     return;
   }
   const first=win&&!S.gates[CURGATE];
-  const souls = win ? (first?120+CURGATE*15:40) : 12;
+  const souls = win ? (first?120+CURGATE*15:40) : (B.resigned!=null?0:12);
   S.souls+=souls; S.plays++; if(win){ S.wins++; S.gates[CURGATE]=1; }
   let bonus='';
   if(first){ const c=grantRare(CURGATE>=9?'極':'秘');
@@ -2812,8 +2850,9 @@ function showResult(){
   const g=GATES[CURGATE];
   sheet(`<div class="result">
     <div class="crumb">${g.no}の門・${esc(g.who)}</div>
-    <div class="big ${win?'win':'lose'}">${win?'勝':'負'}</div>
-    <p class="muted">${win?(first?'門を突破した。':'ふたたび勝った。'):'命が尽きた。組札を練り直そう。'}</p>
+    <div class="big ${win?'win':'lose'}">${win?'勝':(B.resigned!=null?'投':'負')}</div>
+    <p class="muted">${win?(first?'門を突破した。':'ふたたび勝った。')
+      :(B.resigned!=null?'降参した。組札を練り直して挑み直そう。':'命が尽きた。組札を練り直そう。')}</p>
     ${bonus}
     <div class="coin" style="display:inline-block;margin:10px 0">魂片 +${souls}</div>
     <div style="display:flex;gap:8px;margin-top:12px">
@@ -2878,11 +2917,7 @@ window.addEventListener('popstate',()=>{
   if(UI.mode){ cancelMode(); pushNav(); return; }
   if(CUR==='battle'){
     pushNav();
-    sheet(`<h3>対戦をやめますか？</h3>
-      <p class="muted">${MODE==='solo'?'この対局は記録されません。':'相手との対戦を終了します。'}</p>
-      <div style="display:flex;gap:8px;margin-top:14px">
-        <button class="btn sm ghost" style="flex:1" onclick="closeSheet()">続ける</button>
-        <button class="btn sm solid" style="flex:1" onclick="leaveVersus()">やめる</button></div>`);
+    if(B&&!B.over) askResign(); else leaveVersus();
     return;
   }
   if(CUR!=='title'&&CUR!=='gates'){ go('gates'); pushNav(); return; }
