@@ -13,7 +13,8 @@
 <meta property="og:title" content="ウラオモテ">
 <meta property="og:description" content="表と裏、二つの顔を持つ札で戦うカードゲーム">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='10' fill='%2314110f'/%3E%3Crect x='5' y='5' width='54' height='54' rx='7' fill='none' stroke='%23c6a15b' stroke-width='2'/%3E%3Ctext x='32' y='45' font-size='36' font-family='serif' font-weight='700' text-anchor='middle' fill='%23efd79b'%3E%E8%A3%8F%3C/text%3E%3C/svg%3E">
-<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='10' fill='%2314110f'/%3E%3Crect x='5' y='5' width='54' height='54' rx='7' fill='none' stroke='%23c6a15b' stroke-width='2'/%3E%3Ctext x='32' y='45' font-size='36' font-family='serif' font-weight='700' text-anchor='middle' fill='%23efd79b'%3E%E8%A3%8F%3C/text%3E%3C/svg%3E">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-512.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho+B1:wght@500;700;800&family=Zen+Kaku+Gothic+New:wght@400;500;700;900&display=swap" rel="stylesheet">
@@ -351,10 +352,37 @@ body.in-battle #nav{display:none}
   .hand .card{width:88px;height:130px}
   .card .nm{top:92px;font-size:11.5px}.card .rule{top:112px}.card .tx{top:118px}
 }
-@media (prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+/* ── 起動画面 ── */
+#boot{position:fixed;inset:0;z-index:500;background:var(--sumi);display:grid;place-content:center;
+  place-items:center;gap:14px;text-align:center;
+  animation:bootout .5s 1.15s forwards}
+#boot .bl{font-family:var(--mincho);font-weight:800;font-size:clamp(38px,12vw,64px);letter-spacing:.08em;
+  background:linear-gradient(160deg,var(--kin-hi) 10%,var(--kin) 42%,#7d6435 62%,var(--kin-hi) 88%);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+  animation:bootin .8s cubic-bezier(.2,.8,.3,1) both}
+#boot .bs{font-family:var(--mincho);font-size:11px;letter-spacing:.5em;color:var(--kin-dim);
+  animation:bootin .8s .18s cubic-bezier(.2,.8,.3,1) both}
+#boot .bd{width:54px;height:1px;background:linear-gradient(90deg,transparent,var(--kin-dim),transparent);
+  animation:bootin .8s .1s both}
+@keyframes bootin{from{opacity:0;transform:translateY(10px) scale(.96)}}
+@keyframes bootout{to{opacity:0;visibility:hidden}}
+#boot.gone{animation:bootout .38s forwards}
+/* ── アプリとして起動したとき ── */
+body{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+input,textarea{-webkit-user-select:text;user-select:text}
+@media (display-mode:standalone),(display-mode:minimal-ui){
+  .topbar{padding-top:calc(10px + env(safe-area-inset-top))}
+  #screen-battle{padding-top:calc(8px + env(safe-area-inset-top))}
+  #screen-title{padding-top:calc(14px + env(safe-area-inset-top))}
+  #boot{padding-top:env(safe-area-inset-top)}
+}
+.installbar{margin-top:18px}
+@media (prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;transition-duration:.01ms!important}
+  #boot{animation:bootout .01ms .3s forwards}}
 </style>
 </head>
 <body>
+<div id="boot"><div class="bl">ウラオモテ</div><div class="bd"></div><div class="bs">表 裏 一 体</div></div>
 <div id="app">
   <div id="screen-title" class="screen on">
     <div class="logo"><div class="kanji">ウラ<span class="u">オモテ</span></div>
@@ -369,7 +397,8 @@ body.in-battle #nav{display:none}
       <button class="btn" onclick="versusMenu()">友達と対戦</button>
       <button class="btn" onclick="go('rules')">遊び方</button>
     </div>
-    <p class="muted" style="margin-top:26px;max-width:380px">データはこの端末に自動保存されます。HTMLファイル単体で動くので、そのまま人に渡せます。</p>
+    <div class="installbar" id="installwrap"></div>
+    <p class="muted" style="margin-top:22px;max-width:380px">データはこの端末に自動保存されます。一度開けば、電波がなくても遊べます。</p>
   </div>
 
   <div id="screen-gates" class="screen"></div>
@@ -2360,6 +2389,8 @@ function drawRules(){
       <p>${Object.keys(RAR).map(r=>`<span class="kw" style="color:${RAR[r].c};border-color:${RAR[r].c}">${r}</span>`).join('')}の五段。<b>極</b>と<b>神</b>は組札に1枚しか入れられない。</p></div>
     <div class="rulesec"><h3>組札</h3>
       <p>ちょうど30枚。相は2つまで選び、<b>無</b>の札はどの組札にも入る。組札は${DECKSLOTS}つまで持てる。</p></div>
+    <div class="rulesec"><h3>アプリとして入れる</h3>
+      <p>ブラウザのメニューから<b>ホーム画面に追加</b>すると、アドレス欄のないアプリとして起動します。一度開いておけば<b>電波がなくても遊べます</b>。</p></div>
     <div class="rulesec"><h3>友達と対戦</h3>
       <p><b>同じ端末で交互に</b>：1台を回して指す。手番が変わるたび手札を伏せる。</p>
       <p><b>二台をつなぐ</b>：招きの合言葉と返しの合言葉を1回ずつ送り合うと、二台が直接つながる。同じWi-Fiだと確実。</p></div>
@@ -2638,6 +2669,56 @@ function netAutoJoin(code){
   setTimeout(()=>netDoJoin(code),60);
 }
 
+/* ============ アプリとしての振る舞い ============ */
+function standalone(){
+  return (window.matchMedia&&matchMedia('(display-mode: standalone)').matches)
+    ||(window.matchMedia&&matchMedia('(display-mode: minimal-ui)').matches)
+    ||navigator.standalone===true;
+}
+let INSTALL=null;
+function showInstall(){
+  const w=$('installwrap'); if(!w) return;
+  w.innerHTML = (INSTALL&&!standalone())
+    ? '<button class="btn" onclick="doInstall()">ホーム画面に追加する</button>'
+    : '';
+}
+async function doInstall(){
+  if(!INSTALL) return;
+  try{ INSTALL.prompt(); await INSTALL.userChoice; }catch(e){}
+  INSTALL=null; showInstall();
+}
+window.addEventListener('beforeinstallprompt',e=>{ e.preventDefault(); INSTALL=e; showInstall(); });
+window.addEventListener('appinstalled',()=>{ INSTALL=null; showInstall(); toast('ホーム画面に追加しました'); });
+
+/* 戻るボタンでアプリが閉じないように、画面内を1段ずつ戻る */
+function pushNav(){ try{ history.pushState({uo:1},''); }catch(e){} }
+window.addEventListener('popstate',()=>{
+  if($('veil').classList.contains('on')){ if(!STICKY) closeSheet(); pushNav(); return; }
+  if(UI.mode){ cancelMode(); pushNav(); return; }
+  if(CUR==='battle'){
+    pushNav();
+    sheet(`<h3>対戦をやめますか？</h3>
+      <p class="muted">${MODE==='solo'?'この対局は記録されません。':'相手との対戦を終了します。'}</p>
+      <div style="display:flex;gap:8px;margin-top:14px">
+        <button class="btn sm ghost" style="flex:1" onclick="closeSheet()">続ける</button>
+        <button class="btn sm solid" style="flex:1" onclick="leaveVersus()">やめる</button></div>`);
+    return;
+  }
+  if(CUR!=='title'&&CUR!=='gates'){ go('gates'); pushNav(); return; }
+});
+
+/* 常駐係（オフライン再生と更新） */
+if('serviceWorker' in navigator && /^https?:/.test(location.protocol)){
+  window.addEventListener('load',()=>{
+    navigator.serviceWorker.register('sw.js').catch(()=>{});
+  });
+}
+function bootDone(){
+  const b=$('boot'); if(!b) return;
+  b.classList.add('gone');
+  setTimeout(()=>{ if(b&&b.parentNode) b.parentNode.removeChild(b); },600);
+}
+
 /* ============ 起動 ============ */
 S=load()||freshSave();
 if(!S.coll) S.coll={};
@@ -2648,6 +2729,11 @@ ensureDeck(); save();
 drawSoundBtn();
 $('titlestat').innerHTML='全<b>'+CARDS.length+'</b>種・<b>'+(CARDS.length*2)+'</b>の顔／七つの相／五段の位';
 go('title');
+showInstall();
+pushNav();
+if(document.fonts&&document.fonts.ready){ document.fonts.ready.then(()=>setTimeout(bootDone,320)); }
+else setTimeout(bootDone,700);
+setTimeout(bootDone,2200);
 (function(){
   const m=/[#&]j=([A-Za-z0-9_\-]+)/.exec(location.hash||'');
   if(m&&netAvail()){

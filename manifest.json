@@ -1,0 +1,19 @@
+{
+  "id": "./",
+  "name": "ウラオモテ",
+  "short_name": "ウラオモテ",
+  "description": "すべての札に表と裏がある、165種・330の顔のカードゲーム。一人でも、友達と二人でも遊べます。",
+  "lang": "ja",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "display_override": ["standalone", "minimal-ui"],
+  "orientation": "portrait",
+  "background_color": "#14110f",
+  "theme_color": "#14110f",
+  "categories": ["games", "entertainment"],
+  "icons": [
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icon-maskable.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
