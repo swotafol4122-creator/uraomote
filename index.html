@@ -228,15 +228,19 @@ body.in-battle #nav{display:none}
 
 /* ── 対戦盤 ── */
 #screen-battle{padding:8px 8px 4px}
-.side{display:flex;align-items:center;gap:8px;padding:4px 2px}
+.side{display:flex;align-items:center;gap:7px;padding:4px 2px;flex-wrap:wrap}
 .life{font-family:var(--mincho);font-weight:800;font-size:24px;line-height:1;display:flex;align-items:baseline;gap:4px}
 .life small{font-size:10px;letter-spacing:.2em;color:var(--gray);font-family:var(--goth);font-weight:400}
 .life.me{color:#f0cfc6}.life.op{color:#c9dced}
-.kipips{display:flex;gap:3px;flex-wrap:wrap;max-width:150px}
+.kipips{display:flex;gap:3px;flex-wrap:wrap;max-width:104px}
 .pip{width:9px;height:9px;border-radius:50%;border:1px solid var(--kin-dim);background:transparent}
 .pip.on{background:radial-gradient(circle at 34% 28%,var(--kin-hi),var(--kin));border-color:var(--kin)}
 .pip.spent{background:#3a3229}
 .chip{font-size:11px;color:var(--gray);border:1px solid #3a3229;border-radius:2px;padding:1px 7px;white-space:nowrap}
+.chip.warn{color:#e8674f;border-color:#7d2f24;background:rgba(196,64,47,.10)}
+.chip b{color:var(--paper);font-weight:700;font-family:var(--mincho);font-size:12.5px}
+.kinum{font-family:var(--mincho);font-weight:700;font-size:12px;color:var(--kin-hi);white-space:nowrap}
+.kinum small{color:var(--gray);font-size:10px;font-family:var(--goth);font-weight:400}
 .lanes{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin:3px 0}
 .lane{aspect-ratio:.92;border:1px dashed #40382e;border-radius:var(--r);position:relative;
   background:rgba(255,255,255,.014);display:grid;place-items:center;transition:.15s}
@@ -2555,6 +2559,10 @@ function drawRules(){
     <div class="rulesec"><h3>気脈</h3>
       <p>使える気は自然には増えない。<b>自分のターンに手札から1枚、気脈に伏せる</b>と最大の気が1増える（上限10）。</p>
       <p>毎ターン「1枚を燃料にするか、戦力として使うか」を選び続けることになる。これがこのゲームの背骨。</p></div>
+    <div class="rulesec"><h3>山札と疲弊</h3>
+      <p>山は30枚。互いの<b>残り枚数</b>は盤の上下に「山 22」と出ています。</p>
+      <p>引く札が尽きたあとも引こうとすると、<b>1、2、3…と増えていくダメージ</b>を自分の命が受けます（疲弊）。
+        引きすぎる組札は、それ自体が負け筋になります。</p></div>
     <div class="rulesec"><h3>三つの列</h3>
       <p>場は左・中・右の3列。ユニットは<b>正面の敵だけ</b>を攻撃する。正面が空いていれば相手の命を直接殴れる。</p>
       <p>1ターンに1体だけ、空いている列へ<b>陣替え</b>できる。膠着を崩す手段。</p></div>
@@ -2578,6 +2586,12 @@ function pips(P){
   for(let i=0;i<Math.max(P.kiMax,1);i++) h+=`<div class="pip ${i<P.ki?'on':'spent'}"></div>`;
   return h;
 }
+function deckChip(P){
+  const n=P.deck.length;
+  const warn=n<=5;
+  return `<div class="chip ${warn?'warn':''}">山 <b>${n}</b>${P.fatigue?'　疲弊'+P.fatigue:''}</div>`;
+}
+function kiNum(P){ return `<div class="kinum">${P.ki}<small>／${P.kiMax}気</small></div>`; }
 function sideName(s){
   if(MODE==='solo') return s===0?'自分':(B.gate?B.gate.who:'相手');
   return (B.names&&B.names[s])||(s===0?'先手':'後手');
@@ -2631,9 +2645,9 @@ function render(){
    <div class="side">
      <div class="life op" id="life-${FOE()}">${op.life}<small>命</small></div>
      <div class="chip">${esc(sideName(FOE()))}</div>
-     <div class="chip">手札 ${op.hand.length}</div><div class="chip">山 ${op.deck.length}</div>
+     <div class="chip">手札 <b>${op.hand.length}</b></div>${deckChip(op)}
      <div class="chip">祖霊「${SOREI[op.sorei].n}」</div>
-     <div class="spacer"></div><div class="kipips">${pips(op)}</div>
+     <div class="spacer"></div><div class="kipips">${pips(op)}</div>${kiNum(op)}
    </div>
    ${lanesHTML(FOE())}
    <div class="mid"><div class="ln"></div><div class="t">${turnTxt}・${B.turn}巡目</div><div class="ln"></div></div>
@@ -2641,7 +2655,8 @@ function render(){
    ${lanesHTML(ME)}
    <div class="side">
      <div class="life me" id="life-${ME}">${me.life}<small>命</small></div>
-     <div class="kipips">${pips(me)}</div>
+     ${deckChip(me)}
+     <div class="kipips">${pips(me)}</div>${kiNum(me)}
      <div class="spacer"></div>
      <button class="btn sm ${me.soreiUsed||me.ki<sr.c||!mt?'ghost':''}"
        ${me.soreiUsed||me.ki<sr.c||!mt?'disabled':''} onclick="tapSorei()">祖霊「${sr.n}」${sr.c}気</button>
