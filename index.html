@@ -321,9 +321,24 @@ body.in-battle #nav{display:none}
 .packhead{font-family:var(--mincho);font-size:12px;letter-spacing:.28em;color:var(--kin-dim);text-align:center}
 .wrapper.big{width:196px;height:274px;touch-action:none;user-select:none}
 .wrapper.big .seal{width:88px;height:88px;font-size:46px}
-.slit{position:absolute;left:6px;right:6px;top:40%;height:0;border-radius:2px;
+/* 切取線：どこをなぞればいいかを目に見えるようにする */
+.cutband{position:absolute;left:0;right:0;top:34%;height:38px;pointer-events:none;overflow:hidden;
+  background:rgba(0,0,0,.30);
+  border-top:1px dashed rgba(239,215,155,.6);border-bottom:1px dashed rgba(239,215,155,.6)}
+.cutband .lbl{position:absolute;inset:0;display:grid;place-items:center;
+  font-family:var(--mincho);font-size:10px;letter-spacing:.42em;color:var(--kin-hi);opacity:.85;text-indent:.42em}
+.cutprog{position:absolute;left:0;top:0;bottom:0;width:0;
+  background:linear-gradient(90deg,rgba(239,215,155,.12),rgba(239,215,155,.55));transition:width .05s}
+.cutdot{position:absolute;top:50%;width:16px;height:16px;margin-top:-8px;border-radius:50%;
+  background:radial-gradient(circle at 34% 30%,#fff,var(--kin-hi) 55%,var(--kin));
+  box-shadow:0 0 14px rgba(239,215,155,.9);animation:swipehint 2.1s ease-in-out infinite}
+@keyframes swipehint{0%{left:5%;opacity:0}12%{opacity:1}78%{opacity:1}100%{left:80%;opacity:0}}
+.slit{position:absolute;left:4px;right:4px;top:50%;height:0;margin-top:0;border-radius:2px;
   background:linear-gradient(90deg,transparent,var(--kin-hi) 20%,#fff 50%,var(--kin-hi) 80%,transparent);
-  box-shadow:0 0 20px rgba(239,215,155,.9);pointer-events:none}
+  box-shadow:0 0 20px rgba(239,215,155,.9);pointer-events:none;transform:translateY(-50%)}
+.uraline{font-size:11.5px;color:#9fb4c4;line-height:1.55;text-align:center;max-width:260px;
+  border-top:1px solid #2f2823;padding-top:8px}
+.uraline b{color:#bcdcf1;font-family:var(--mincho);font-size:12.5px}
 .wrapper.shake{animation:shk .3s}
 @keyframes shk{0%,100%{transform:translateX(0)}30%{transform:translateX(-3px)}70%{transform:translateX(3px)}}
 .wrapper.torn{animation:torn .55s forwards}
@@ -2191,7 +2206,7 @@ function bothFaces(C,cur,big){
        ${cur?`<div class="facetag ${cur===f?'now':''}">${cur===f?'今この面':'裏の顔'}</div>`:''}
      </div>`).join('')+`</div>`;
 }
-function cardDetail(C){
+function cardDetail(C,back){
   const A=ASP[C.asp];
   const kwall=[].concat(C.o.kw||[],C.u.kw||[]).filter((v,i,a)=>a.indexOf(v)===i);
   const n=ownedCount(C.id), cap=copyCap(C);
@@ -2203,7 +2218,7 @@ function cardDetail(C){
    <p style="font-size:13px;margin:8px 0 0">${own}</p>
    ${bothFaces(C,null,1)}
    ${kwall.length?`<div style="margin-top:14px">${kwall.map(k=>`<p class="muted" style="margin:2px 0"><span class="kw">${k}</span>${KWTX[k]||''}</p>`).join('')}</div>`:''}
-   <button class="btn wide ghost" style="margin-top:12px" onclick="closeSheet()">閉じる</button>`);
+   <button class="btn wide ghost" style="margin-top:12px" onclick="${back||'closeSheet()'}">${back?'戻る':'閉じる'}</button>`);
 }
 
 /* ============ 十二門 ============ */
@@ -2502,8 +2517,16 @@ function packRender(){
   if(PK.phase==='seal'){
     sheet(`<div class="packstage">
       <div class="packhead">${P.nm}　${P.n}枚</div>
-      <div class="wrapper big" id="packwrap"><div class="seal">${P.nm[0]}</div><div class="slit" id="packslit"></div></div>
-      <div class="tearhint"><b>指でなぞって</b>封を切る</div>
+      <div class="wrapper big" id="packwrap">
+        <div class="seal">${P.nm[0]}</div>
+        <div class="cutband">
+          <div class="cutprog" id="cutprog"></div>
+          <div class="lbl">切 取 線</div>
+          <div class="cutdot" id="cutdot"></div>
+          <div class="slit" id="packslit"></div>
+        </div>
+      </div>
+      <div class="tearhint">この<b>切取線</b>を左右になぞる</div>
       <button class="btn sm ghost" onclick="packTear()">なぞらずに開ける</button>
     </div>`,true);
     const wr=$('packwrap');
@@ -2519,27 +2542,9 @@ function packRender(){
     return;
   }
   if(PK.phase==='cards'){
-    const c=PK.cards[PK.i];
-    const hi=RAR[c.rar].v>=50;
-    sheet(`<div class="packstage">
-      <div class="packhead">${PK.i+1} / ${PK.cards.length}</div>
-      <div class="pstage" id="pstage">
-        <div class="burst" id="pburst" style="background:radial-gradient(circle,${RAR[c.rar].c}cc,transparent 68%)"></div>
-        <div class="pflip ${PK.flipped?'on':''}" id="pflip">
-          <div class="pf b">${backHTML().replace('class="card back"','class="card back" style="width:176px;height:258px"')}</div>
-          <div class="pf f">${cardHTML(c,'o',{big:1})}</div>
-        </div>
-      </div>
-      ${packDots()}
-      <div class="tearhint">${PK.flipped?'<b>もう一度</b>で次の札へ':'<b>触れて</b>めくる'}</div>
-      <div style="display:flex;gap:8px">
-        <button class="btn sm ghost" onclick="packAll()">全部めくる</button>
-        <button class="btn sm" onclick="packStep()">${PK.flipped?'次へ':'めくる'}</button>
-      </div>
-    </div>`,true);
-    const st=$('pstage');
-    if(st){ st.addEventListener('pointerup',packStep); st.addEventListener('touchend',e=>{e.preventDefault();packStep();},{passive:false}); }
-    return;
+    const c=PK.cards[PK.i], o=c[PK.flipped?'u':'o'];
+    const ura=c.u, kw=(ura.kw||[]).join('・');
+    return sheetCards(c,ura,kw,P);
   }
   /* 開け終わり */
   const best=PK.cards.slice().sort((a,b)=>RAR[b.rar].v-RAR[a.rar].v)[0];
@@ -2552,6 +2557,39 @@ function packRender(){
       <button class="btn sm solid" style="flex:1" onclick="closeSheet();drawShop()">しまう</button>
     </div>`);
   drawShop();
+}
+function sheetCards(c,ura,kw,P){
+  const rc=RAR[c.rar];
+  sheet(`<div class="packstage">
+    <div class="packhead">${PK.i+1} / ${PK.cards.length}　${PK.flipped?'<span style="color:'+rc.c+'">'+c.rar+'</span>':'封の中'}</div>
+    <div class="pstage" id="pstage">
+      <div class="burst" id="pburst" style="background:radial-gradient(circle,${rc.c}cc,transparent 68%)"></div>
+      <div class="pflip ${PK.flipped?'on':''}" id="pflip">
+        <div class="pf b">${backHTML().replace('class="card back"','class="card back" style="width:176px;height:258px"')}</div>
+        <div class="pf f">${cardHTML(c,'o',{big:1})}</div>
+      </div>
+    </div>
+    ${PK.flipped?`<div class="uraline">裏の顔　<b>${esc(ura.n)}</b>　${ura.c}気${ura.t==='u'?'　力'+ura.a+'／耐'+ura.h:'　術'}<br>
+      ${kw?'<span style="color:var(--kin-dim)">'+kw+'</span>　':''}${esc(ura.tx||'')}</div>`:''}
+    ${packDots()}
+    <div class="tearhint">${PK.flipped?'ゆっくり読んでから<b>次の札へ</b>':'<b>札に触れて</b>めくる'}</div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center">
+      ${PK.flipped?`<button class="btn sm" onclick="cardDetail(BYID['${c.id}'],'packRender()')">両面を大きく見る</button>
+        <button class="btn sm solid" onclick="packNext()">次の札へ（${PK.i+1}/${PK.cards.length}）</button>`
+        :`<button class="btn sm solid" onclick="packStep()">めくる</button>`}
+      <button class="btn sm ghost" onclick="packAll()">全部めくる</button>
+    </div>
+  </div>`,true);
+  const st=$('pstage');
+  if(st){
+    st.addEventListener('pointerup',packTapCard);
+    st.addEventListener('touchend',e=>{e.preventDefault();packTapCard();},{passive:false});
+  }
+}
+function packTapCard(){
+  if(PK.phase!=='cards'||PK.busy) return;
+  if(!PK.flipped) return packStep();
+  cardDetail(PK.cards[PK.i],'packRender()');   /* めくった後は消えず、両面を読める */
 }
 function pxy(e){
   if(e.touches&&e.touches[0]) return [e.touches[0].clientX,e.touches[0].clientY];
@@ -2567,13 +2605,17 @@ function packMove(e){
   const wr=$('packwrap'); if(!wr) return;
   const w=wr.offsetWidth||196, r=Math.min(1,PK.drag/(w*0.62));
   const sl=$('packslit'); if(sl) sl.style.height=(r*13)+'px';
+  const pg=$('cutprog'); if(pg) pg.style.width=(r*100)+'%';
+  const dt=$('cutdot'); if(dt&&r>0.05) dt.style.display='none';
   if(r>=1){ PK.dragging=false; packTear(); }
 }
 function packUp(){
   if(PK.phase!=='seal') return;
   PK.dragging=false;
-  const wr=$('packwrap'), sl=$('packslit');
+  const wr=$('packwrap'), sl=$('packslit'), pg=$('cutprog'), dt=$('cutdot');
   if(sl) sl.style.height='0px';
+  if(pg) pg.style.width='0%';
+  if(dt) dt.style.display='';
   if(wr&&PK.drag>4){ wr.classList.add('shake'); setTimeout(()=>wr&&wr.classList.remove('shake'),320); }
   PK.drag=0;
 }
@@ -2585,20 +2627,19 @@ function packTear(){
   if(wr){ wr.classList.add('torn'); setTimeout(packRender,430); }
   else packRender();
 }
-function packStep(){
-  if(PK.phase!=='cards'||PK.busy) return;
-  if(!PK.flipped){
-    PK.flipped=true;
-    const fl=$('pflip'); if(fl) fl.classList.add('on');
-    const c=PK.cards[PK.i], hi=RAR[c.rar].v>=50;
-    sfx(hi?'win':'card');
-    if(hi){ const b=$('pburst'); if(b){ b.classList.add('on'); setTimeout(()=>b&&b.classList.remove('on'),950); } }
-    const hint=$('sheet').querySelector('.tearhint');
-    if(hint) hint.innerHTML='<b>もう一度</b>で次の札へ';
-    return;
-  }
-  const st=$('pstage');
+function packStep(){          /* めくるだけ。札はその場に留まる */
+  if(PK.phase!=='cards'||PK.busy||PK.flipped) return;
+  PK.flipped=true;
+  const fl=$('pflip'); if(fl) fl.classList.add('on');
+  const c=PK.cards[PK.i], hi=RAR[c.rar].v>=50;
+  sfx(hi?'win':'card');
+  if(hi){ const b=$('pburst'); if(b){ b.classList.add('on'); setTimeout(()=>b&&b.classList.remove('on'),950); } }
+  setTimeout(()=>{ if(PK.phase==='cards'&&PK.flipped) packRender(); },560);
+}
+function packNext(){          /* 読み終えてから自分で進める */
+  if(PK.phase!=='cards'||PK.busy||!PK.flipped) return;
   PK.busy=true;
+  const st=$('pstage');
   const go=()=>{ PK.busy=false; PK.i++; PK.flipped=false;
     PK.phase = PK.i>=PK.cards.length ? 'done':'cards'; packRender(); };
   if(st){ st.classList.add('gone'); setTimeout(go,300); } else go();
