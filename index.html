@@ -306,7 +306,47 @@ body.in-battle #nav{display:none}
 .hand .card.chosen{transform:translateY(-8px)}
 .battlebar{display:flex;gap:6px;align-items:center;padding:4px 0 calc(6px + env(safe-area-inset-bottom))}
 .log{font-size:11px;color:#8e8377;height:34px;overflow:hidden;line-height:1.5;flex:1;
-  border-left:2px solid #3a3229;padding-left:8px}
+  border-left:2px solid #3a3229;padding-left:8px;cursor:pointer;position:relative}
+.log:hover{color:var(--paper);border-left-color:var(--kin-dim)}
+.log .more{position:absolute;right:0;bottom:0;font-size:9px;color:#5c5145;letter-spacing:.1em}
+/* ── 戦さの記録 ── */
+.logturn{margin:12px 0 4px;display:flex;align-items:center;gap:8px}
+.logturn .t{font-family:var(--mincho);font-size:12px;letter-spacing:.14em;color:var(--kin-hi);white-space:nowrap}
+.logturn .t.foe{color:#9fc4de}
+.logturn .ln{flex:1;height:1px;background:linear-gradient(90deg,#4d4238,transparent)}
+.logline{font-size:12.5px;color:#bdb2a3;line-height:1.7;padding-left:10px;border-left:1px solid #2f2823}
+.logline.foe{color:#a4b6c4}
+/* ── 開封 ── */
+.packstage{display:grid;place-items:center;gap:14px;padding:6px 0}
+.packhead{font-family:var(--mincho);font-size:12px;letter-spacing:.28em;color:var(--kin-dim);text-align:center}
+.wrapper.big{width:196px;height:274px;touch-action:none;user-select:none}
+.wrapper.big .seal{width:88px;height:88px;font-size:46px}
+.slit{position:absolute;left:6px;right:6px;top:40%;height:0;border-radius:2px;
+  background:linear-gradient(90deg,transparent,var(--kin-hi) 20%,#fff 50%,var(--kin-hi) 80%,transparent);
+  box-shadow:0 0 20px rgba(239,215,155,.9);pointer-events:none}
+.wrapper.shake{animation:shk .3s}
+@keyframes shk{0%,100%{transform:translateX(0)}30%{transform:translateX(-3px)}70%{transform:translateX(3px)}}
+.wrapper.torn{animation:torn .55s forwards}
+@keyframes torn{35%{transform:scale(1.07) rotate(-1.5deg)}100%{opacity:0;transform:scale(1.35) rotate(2deg)}}
+.tearhint{font-size:12px;color:var(--gray);text-align:center}
+.tearhint b{color:var(--kin-hi);font-family:var(--mincho)}
+.pstage{position:relative;width:176px;height:258px;perspective:1100px;touch-action:none;user-select:none}
+.pflip{position:absolute;inset:0;transform-style:preserve-3d;transition:transform .55s cubic-bezier(.3,.85,.3,1)}
+.pflip.on{transform:rotateY(180deg)}
+.pflip .pf{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden}
+.pflip .pf.b{transform:rotateY(0deg)}
+.pflip .pf.f{transform:rotateY(180deg)}
+.pstage.gone{animation:pgo .34s forwards}
+@keyframes pgo{to{opacity:0;transform:translateY(-46px) scale(.86)}}
+.burst{position:absolute;inset:-28px;border-radius:50%;pointer-events:none;opacity:0}
+.burst.on{animation:bst .9s ease-out}
+@keyframes bst{0%{opacity:0;transform:scale(.5)}25%{opacity:.85}100%{opacity:0;transform:scale(1.5)}}
+.packrow{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;min-height:30px}
+.pdot{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;
+  font-family:var(--mincho);font-size:13px;font-weight:800;color:#f4ecda;
+  border:2px solid #3a3229;background:#241d17}
+.pdot.done{border-color:currentColor}
+.pcount{font-family:var(--mincho);font-size:14px;letter-spacing:.1em;color:var(--kin-hi)}
 
 /* ── モーダル ── */
 .veil{position:fixed;inset:0;background:rgba(8,6,5,.86);z-index:100;display:none;
@@ -494,14 +534,14 @@ CARDS.push(
  o:{n:'火の粉',g:'粉',c:1,t:'s',tgt:'enemy',fx:{on:'cast',op:'dmgTarget',v:2},tx:'敵1体に2ダメージ'},
  u:{n:'焚べる',g:'焚',c:1,t:'s',tgt:'ally',fx:{on:'cast',op:'buffTarget',a:2,h:0},tx:'味方1体に力+2'}},
 {id:'ho03',nm:'熾火兵',asp:'ho',rar:'常',
- o:{n:'熾火の兵',g:'熾',c:3,t:'u',a:3,h:3},
- u:{n:'走り火',g:'走',c:2,t:'u',a:2,h:2,kw:['速攻']}},
+ o:{n:'熾火の兵',g:'熾',c:3,t:'u',a:3,h:3,kw:['二面']},
+ u:{n:'走り火',g:'走',c:2,t:'u',a:2,h:2,kw:['速攻','二面']}},
 {id:'ho08',nm:'燐火の従者',asp:'ho',rar:'常',
  o:{n:'燐火の従者',g:'燐',c:1,t:'u',a:1,h:1,kw:['速攻','貫通']},
  u:{n:'消し炭の従者',g:'炭',c:1,t:'u',a:0,h:3,kw:['盾']}},
 {id:'ho09',nm:'爆ぜる甲虫',asp:'ho',rar:'常',
  o:{n:'爆ぜる甲虫',g:'爆',c:2,t:'u',a:2,h:2,fx:{on:'death',op:'dmgFront',v:2},tx:'退場時：正面に2'},
- u:{n:'火薬の甲虫',g:'薬',c:2,t:'u',a:1,h:1,fx:{on:'death',op:'dmgLeader',v:3},tx:'退場時：相手の命に3'}},
+ u:{n:'火薬の甲虫',g:'薬',c:1,t:'u',a:1,h:1,fx:{on:'death',op:'dmgLeader',v:3},tx:'退場時：相手の命に3'}},
 {id:'ho12',nm:'火継ぎの子',asp:'ho',rar:'常',
  o:{n:'火継ぎの子',g:'継',c:2,t:'u',a:1,h:2,fx:{on:'play',op:'draw',v:1},tx:'登場時：1枚引く'},
  u:{n:'先駆けの子',g:'駆',c:2,t:'u',a:2,h:1,kw:['速攻']}},
@@ -531,8 +571,8 @@ CARDS.push(
  o:{n:'火柱',g:'柱',c:3,t:'s',tgt:'enemy',fx:{on:'cast',op:'dmgTarget',v:4},tx:'敵1体に4ダメージ'},
  u:{n:'飛び火',g:'飛',c:3,t:'s',fx:{on:'cast',op:'dmgLeader',v:3},tx:'相手の命に3ダメージ'}},
 {id:'ho17',nm:'双炎の武者',asp:'ho',rar:'珍',
- o:{n:'双炎の武者',g:'双',c:4,t:'u',a:3,h:3,kw:['連撃']},
- u:{n:'片炎の武者',g:'片',c:3,t:'u',a:2,h:4,kw:['反射']}},
+ o:{n:'双炎の武者',g:'双',c:4,t:'u',a:3,h:3,kw:['連撃','二面']},
+ u:{n:'片炎の武者',g:'片',c:3,t:'u',a:2,h:4,kw:['反射','二面'],fx:{on:'flip',op:'dmgFront',v:2},tx:'反転したとき：正面に2'}},
 {id:'ho18',nm:'火渡りの行者',asp:'ho',rar:'珍',
  o:{n:'火渡りの行者',g:'渡',c:3,t:'u',a:2,h:2,fx:{on:'play',ops:[{op:'dmgSelf',v:3},{op:'gainKi',v:3}]},tx:'登場時：自分の命-3、気+3'},
  u:{n:'水垢離の行者',g:'垢',c:4,t:'u',a:4,h:3,kw:['吸命']}},
@@ -547,8 +587,8 @@ CARDS.push(
  o:{n:'灼熱の大鎌',g:'鎌',c:5,t:'u',a:5,h:3,kw:['毒手']},
  u:{n:'返しの小鎌',g:'返',c:4,t:'u',a:3,h:3,kw:['連撃','速攻']}},
 {id:'ho21',nm:'火群の呼び手',asp:'ho',rar:'秘',
- o:{n:'火群の呼び手',g:'群',c:4,t:'u',a:3,h:4,fx:{on:'turn',op:'summon',tok:'t_hinoko',v:1},tx:'自ターン開始時：空きに火の子(1/1速攻)'},
- u:{n:'焔煽りの巫',g:'煽',c:4,t:'u',a:2,h:3,fx:{on:'play',ops:[{op:'grantAll',kw:'速攻'},{op:'buffAll',a:1,h:0}]},tx:'登場時：味方全てに速攻と力+1'}},
+ o:{n:'火群の呼び手',g:'群',c:4,t:'u',a:3,h:4,kw:['二面'],fx:{on:'turn',op:'summon',tok:'t_hinoko',v:1},tx:'自ターン開始時：空きに火の子'},
+ u:{n:'焔煽りの巫',g:'煽',c:3,t:'u',a:2,h:3,kw:['二面'],fx:{on:'play',ops:[{op:'grantAll',kw:'速攻'},{op:'buffAll',a:1,h:0}]},tx:'登場時：味方全てに速攻と力+1'}},
 {id:'ho22',nm:'業炎の門',asp:'ho',rar:'秘',
  o:{n:'業炎の門',g:'業',c:6,t:'s',fx:{on:'cast',op:'dmgAllEnemy',v:4},tx:'敵全てに4ダメージ'},
  u:{n:'焦土の誓い',g:'誓',c:3,t:'s',fx:{on:'cast',ops:[{op:'dmgLeader',v:5},{op:'dmgSelf',v:2}]},tx:'相手の命に5、自分の命-2'}},
@@ -557,7 +597,7 @@ CARDS.push(
  o:{n:'焔王・迦具土',g:'迦',c:7,t:'u',a:6,h:6,kw:['速攻','貫通'],fx:{on:'play',op:'dmgAllEnemy',v:2},tx:'登場時：敵全てに2'},
  u:{n:'燠火の迦具土',g:'燠',c:5,t:'u',a:4,h:4,kw:['再起','吸命']}},
 {id:'ho23',nm:'灰燼の獄卒',asp:'ho',rar:'極',
- o:{n:'灰燼の獄卒',g:'獄',c:7,t:'u',a:6,h:5,kw:['貫通','余波']},
+ o:{n:'灰燼の獄卒',g:'獄',c:7,t:'u',a:6,h:5,kw:['貫通','余波'],fx:{on:'play',op:'dmgLeader',v:3},tx:'登場時：相手の命に3'},
  u:{n:'炉焚きの獄卒',g:'炉',c:5,t:'u',a:4,h:4,kw:['速攻','毒手']}},
 
 {id:'ho24',nm:'大禍・終焉ノ火',asp:'ho',rar:'神',
@@ -569,19 +609,19 @@ CARDS.push(
 CARDS.push(
 {id:'fu01',nm:'淵の使い',asp:'fu',rar:'常',
  o:{n:'淵の使い',g:'使',c:2,t:'u',a:2,h:2,fx:{on:'play',op:'freezeFront'},tx:'登場時：正面を凍結'},
- u:{n:'凪の使い',g:'凪',c:2,t:'u',a:1,h:3,fx:{on:'play',op:'draw',v:1},tx:'登場時：1枚引く'}},
+ u:{n:'凪の使い',g:'凪',c:2,t:'u',a:1,h:3,fx:{on:'play',op:'weakenFront',v:1},tx:'登場時：正面の力-1'}},
 {id:'fu02',nm:'波返し',asp:'fu',rar:'常',
  o:{n:'波返し',g:'波',c:2,t:'s',tgt:'enemy',fx:{on:'cast',op:'bounceTarget'},tx:'敵1体を手札に戻す'},
  u:{n:'寄せ波',g:'寄',c:2,t:'s',tgt:'ally',fx:{on:'cast',op:'flipTarget'},tx:'味方1体を反転させる'}},
 {id:'fu03',nm:'深海の見張り',asp:'fu',rar:'常',
- o:{n:'深海の見張り',g:'深',c:3,t:'u',a:2,h:4,kw:['盾']},
- u:{n:'浅瀬の見張り',g:'浅',c:3,t:'u',a:3,h:3,kw:['幻']}},
+ o:{n:'深海の見張り',g:'深',c:3,t:'u',a:2,h:4,kw:['盾','二面']},
+ u:{n:'浅瀬の見張り',g:'浅',c:3,t:'u',a:3,h:3,kw:['幻','二面']}},
 {id:'fu04',nm:'霧隠れ',asp:'fu',rar:'常',
  o:{n:'霧隠れ',g:'霧',c:1,t:'s',tgt:'ally',fx:{on:'cast',op:'grantTarget',kw:'幻'},tx:'味方1体に幻を与える'},
  u:{n:'霧払い',g:'払',c:1,t:'s',fx:{on:'cast',op:'draw',v:1},tx:'1枚引く'}},
 {id:'fu09',nm:'水鏡の兵',asp:'fu',rar:'常',
- o:{n:'水鏡の兵',g:'鏡',c:2,t:'u',a:2,h:2,kw:['反射']},
- u:{n:'陽炎の兵',g:'陽',c:1,t:'u',a:1,h:2,kw:['幻']}},
+ o:{n:'水鏡の兵',g:'鏡',c:2,t:'u',a:2,h:2,kw:['反射','二面']},
+ u:{n:'陽炎の兵',g:'陽',c:1,t:'u',a:1,h:2,kw:['幻','二面'],fx:{on:'flip',op:'draw',v:1},tx:'反転したとき：1枚引く'}},
 {id:'fu12',nm:'泡沫の従者',asp:'fu',rar:'常',
  o:{n:'泡沫の従者',g:'泡',c:1,t:'u',a:1,h:1,fx:{on:'play',op:'draw',v:1},tx:'登場時：1枚引く'},
  u:{n:'堰の従者',g:'堰',c:2,t:'u',a:0,h:4,kw:['盾']}},
@@ -590,7 +630,7 @@ CARDS.push(
  u:{n:'流れ者',g:'流',c:2,t:'u',a:2,h:2,kw:['遠当']}},
 {id:'fu14',nm:'潜り漁師',asp:'fu',rar:'常',
  o:{n:'潜り漁師',g:'漁',c:3,t:'u',a:3,h:2,kw:['遠当']},
- u:{n:'網打ちの漁師',g:'網',c:2,t:'u',a:1,h:2,fx:{on:'play',op:'draw',v:1},tx:'登場時：1枚引く'}},
+ u:{n:'網打ちの漁師',g:'網',c:2,t:'u',a:2,h:2}},
 {id:'fu15',nm:'静かな湖面',asp:'fu',rar:'常',
  o:{n:'静かな湖面',g:'湖',c:2,t:'s',tgt:'enemy',fx:{on:'cast',ops:[{op:'freezeTarget'},{op:'draw',v:1}]},tx:'敵1体を凍結し、1枚引く'},
  u:{n:'水面の膜',g:'膜',c:1,t:'s',tgt:'ally',fx:{on:'cast',op:'grantTarget',kw:'結界'},tx:'味方1体に結界を与える'}},
@@ -599,16 +639,16 @@ CARDS.push(
  u:{n:'岩噛みの兵',g:'岩',c:2,t:'u',a:2,h:2,kw:['不屈']}},
 
 {id:'fu05',nm:'潮鳴りの巫女',asp:'fu',rar:'珍',
- o:{n:'潮鳴りの巫女',g:'潮',c:4,t:'u',a:3,h:3,fx:{on:'play',op:'freezeAllEnemy'},tx:'登場時：敵全てを凍結'},
+ o:{n:'潮鳴りの巫女',g:'潮',c:5,t:'u',a:3,h:3,fx:{on:'play',op:'freezeAllEnemy'},tx:'登場時：敵全てを凍結'},
  u:{n:'汐待ちの巫女',g:'汐',c:3,t:'u',a:2,h:3,fx:{on:'play',ops:[{op:'draw',v:1},{op:'gainKi',v:1}]},tx:'登場時：1枚引き、気+1'}},
 {id:'fu06',nm:'渦潮',asp:'fu',rar:'珍',
- o:{n:'渦潮',g:'渦',c:5,t:'s',fx:{on:'cast',op:'bounceAllEnemy'},tx:'敵全てを手札に戻す'},
+ o:{n:'渦潮',g:'渦',c:6,t:'s',fx:{on:'cast',op:'bounceAllEnemy'},tx:'敵全てを手札に戻す'},
  u:{n:'底流',g:'底',c:2,t:'s',tgt:'enemy',fx:{on:'cast',op:'flipTarget'},tx:'敵1体を反転させる'}},
 {id:'fu07',nm:'蒼鱗の術師',asp:'fu',rar:'珍',
  o:{n:'蒼鱗の術師',g:'蒼',c:5,t:'u',a:4,h:4,kw:['二面']},
  u:{n:'白鱗の術師',g:'白',c:4,t:'u',a:2,h:6,fx:{on:'turn',op:'freezeFront'},tx:'自ターン開始時：正面を凍結'}},
 {id:'fu11',nm:'静寂の刻',asp:'fu',rar:'珍',
- o:{n:'静寂の刻',g:'静',c:4,t:'s',fx:{on:'cast',ops:[{op:'freezeAllEnemy'},{op:'draw',v:1}]},tx:'敵全てを凍結し、1枚引く'},
+ o:{n:'静寂の刻',g:'静',c:3,t:'s',fx:{on:'cast',op:'freezeAllEnemy'},tx:'敵ユニット全てを凍結する'},
  u:{n:'目覚めの刻',g:'覚',c:2,t:'s',fx:{on:'cast',op:'wake'},tx:'味方全ての凍結を解き、+1/+1'}},
 {id:'fu17',nm:'深淵の触手',asp:'fu',rar:'珍',
  o:{n:'深淵の触手',g:'触',c:4,t:'u',a:2,h:5,kw:['余波']},
@@ -617,8 +657,8 @@ CARDS.push(
  o:{n:'逆巻く波',g:'逆',c:3,t:'s',fx:{on:'cast',op:'swapAllEnemy'},tx:'敵全ての力と耐久を入れ替える'},
  u:{n:'凪の護り',g:'護',c:3,t:'s',tgt:'ally',fx:{on:'cast',ops:[{op:'buffTarget',a:2,h:2},{op:'grantTarget',kw:'結界'}]},tx:'味方1体に+2/+2と結界'}},
 {id:'fu19',nm:'霜の巫覡',asp:'fu',rar:'珍',
- o:{n:'霜の巫覡',g:'霜',c:4,t:'u',a:3,h:3,fx:{on:'play',ops:[{op:'freezeFront'},{op:'draw',v:1}]},tx:'登場時：正面を凍結し1枚引く'},
- u:{n:'氷柱の巫覡',g:'氷',c:3,t:'u',a:2,h:4,kw:['不屈'],fx:{on:'turn',op:'freezeFront'},tx:'自ターン開始時：正面を凍結'}},
+ o:{n:'霜の巫覡',g:'霜',c:4,t:'u',a:3,h:4,kw:['二面'],fx:{on:'play',ops:[{op:'freezeFront'},{op:'draw',v:1}]},tx:'登場時：正面を凍結し1枚引く'},
+ u:{n:'氷柱の巫覡',g:'氷',c:3,t:'u',a:2,h:4,kw:['不屈','二面'],fx:{on:'turn',op:'freezeFront'},tx:'自ターン開始時：正面を凍結'}},
 
 {id:'fu08',nm:'忘却の淵',asp:'fu',rar:'秘',
  o:{n:'忘却の淵',g:'忘',c:5,t:'s',tgt:'enemy',fx:{on:'cast',op:'destroyTarget'},tx:'敵1体を破壊する'},
@@ -627,7 +667,7 @@ CARDS.push(
  o:{n:'海淵の司',g:'司',c:5,t:'u',a:4,h:5,kw:['結界']},
  u:{n:'潮溜まりの司',g:'溜',c:5,t:'u',a:2,h:6,kw:['盾','結界'],fx:{on:'turn',op:'draw',v:1},tx:'自ターン開始時：1枚引く'}},
 {id:'fu21',nm:'記憶の鏡',asp:'fu',rar:'秘',
- o:{n:'記憶の鏡',g:'写',c:4,t:'s',tgt:'enemy',fx:{on:'cast',op:'stealTarget'},tx:'敵1体を破壊し、その札を手札に加える'},
+ o:{n:'記憶の鏡',g:'写',c:5,t:'s',tgt:'enemy',fx:{on:'cast',op:'stealTarget'},tx:'敵1体を破壊し、その札を手札に加える'},
  u:{n:'忘れ鏡',g:'朧',c:2,t:'s',fx:{on:'cast',op:'discardEnemy',v:2},tx:'相手の手札を2枚捨てさせる'}},
 {id:'fu22',nm:'凍て付く刻',asp:'fu',rar:'秘',
  o:{n:'凍て付く刻',g:'凍',c:5,t:'s',fx:{on:'cast',ops:[{op:'freezeAllEnemy'},{op:'dmgAllEnemy',v:2}]},tx:'敵全てを凍結し、2ダメージ'},
@@ -663,14 +703,14 @@ CARDS.push(
  o:{n:'墓守',g:'墓',c:3,t:'u',a:2,h:3,kw:['盾']},
  u:{n:'掘り返し',g:'掘',c:2,t:'u',a:1,h:2,fx:{on:'play',op:'returnDead'},tx:'登場時：退場した味方1枚を手札へ'}},
 {id:'mu12',nm:'骨兵',asp:'mu',rar:'常',
- o:{n:'骨兵',g:'兵',c:1,t:'u',a:1,h:2},
+ o:{n:'骨兵',g:'兵',c:1,t:'u',a:0,h:3,kw:['盾']},
  u:{n:'走る骨',g:'骸',c:1,t:'u',a:2,h:1,kw:['速攻']}},
 {id:'mu13',nm:'腐肉喰い',asp:'mu',rar:'常',
- o:{n:'腐肉喰い',g:'腐',c:2,t:'u',a:3,h:1},
- u:{n:'毒牙の獣',g:'牙',c:2,t:'u',a:1,h:2,kw:['毒手']}},
+ o:{n:'腐肉喰い',g:'腐',c:2,t:'u',a:3,h:1,kw:['二面']},
+ u:{n:'毒牙の獣',g:'牙',c:2,t:'u',a:1,h:2,kw:['毒手','二面'],fx:{on:'flip',op:'dmgLeader',v:2},tx:'反転したとき：相手の命に2'}},
 {id:'mu14',nm:'通夜の灯',asp:'mu',rar:'常',
  o:{n:'通夜の灯',g:'夜',c:1,t:'s',fx:{on:'cast',ops:[{op:'dmgSelf',v:2},{op:'draw',v:2}]},tx:'自分の命-2、2枚引く'},
- u:{n:'弔いの灯',g:'弔',c:1,t:'s',fx:{on:'cast',ops:[{op:'dmgLeader',v:1},{op:'draw',v:1}]},tx:'相手の命に1、1枚引く'}},
+ u:{n:'道連れ',g:'連',c:2,t:'s',tgt:'enemy',fx:{on:'cast',ops:[{op:'destroyTarget'},{op:'dmgSelf',v:4}]},tx:'敵1体を破壊し、自分の命-4'}},
 {id:'mu15',nm:'骨拾いの童',asp:'mu',rar:'常',
  o:{n:'骨拾いの童',g:'童',c:1,t:'u',a:1,h:1,fx:{on:'death',op:'summonHere',tok:'t_hone'},tx:'退場時：同じ列に骨兵(2/2)'},
  u:{n:'野辺送りの童',g:'辺',c:2,t:'u',a:2,h:2,fx:{on:'death',op:'draw',v:1},tx:'退場時：1枚引く'}},
@@ -685,7 +725,7 @@ CARDS.push(
  o:{n:'呪縛',g:'呪',c:3,t:'s',tgt:'enemy',fx:{on:'cast',ops:[{op:'dmgTarget',v:4},{op:'dmgSelf',v:1}]},tx:'敵1体に4、自分の命-1'},
  u:{n:'転倒',g:'転',c:3,t:'s',tgt:'enemy',fx:{on:'cast',op:'swapTarget'},tx:'敵1体の力と耐久を入れ替える'}},
 {id:'mu09',nm:'死出の渡し守',asp:'mu',rar:'珍',
- o:{n:'死出の渡し守',g:'渡',c:4,t:'u',a:3,h:4,kw:['再起']},
+ o:{n:'死出の渡し守',g:'渡',c:4,t:'u',a:4,h:4,kw:['再起']},
  u:{n:'黄泉の渡し守',g:'泉',c:4,t:'u',a:2,h:5,kw:['再起','吸命']}},
 {id:'mu11',nm:'生贄の祭壇',asp:'mu',rar:'珍',
  o:{n:'生贄の祭壇',g:'祭',c:1,t:'s',tgt:'ally',fx:{on:'cast',op:'sacKi',v:2},tx:'味方1体を壊し、気+2'},
@@ -707,8 +747,8 @@ CARDS.push(
  o:{n:'黄泉比良坂',g:'坂',c:5,t:'s',fx:{on:'cast',op:'sacAllBolt'},tx:'味方全てを壊し、1体につき相手の命に2'},
  u:{n:'還りの道',g:'還',c:4,t:'s',fx:{on:'cast',op:'returnDead',v:3},tx:'退場した味方を3枚まで手札へ'}},
 {id:'mu21',nm:'死神の秤',asp:'mu',rar:'秘',
- o:{n:'死神の秤',g:'秤',c:5,t:'u',a:4,h:4,kw:['毒手','遠当']},
- u:{n:'骨拾いの秤',g:'量',c:4,t:'u',a:3,h:3,kw:['再起','毒手']}},
+ o:{n:'死神の秤',g:'秤',c:5,t:'u',a:4,h:4,kw:['毒手','遠当','二面']},
+ u:{n:'骨拾いの秤',g:'量',c:4,t:'u',a:3,h:3,kw:['再起','毒手','二面']}},
 {id:'mu22',nm:'穢れの司祭',asp:'mu',rar:'秘',
  o:{n:'穢れの司祭',g:'穢',c:4,t:'u',a:2,h:5,fx:{on:'turn',op:'drainLeader',v:2},tx:'自ターン開始時：相手の命に2、自分の命+2'},
  u:{n:'清めの司祭',g:'清',c:3,t:'u',a:2,h:4,kw:['盾'],fx:{on:'play',op:'healLeader',v:4},tx:'登場時：自分の命+4'}},
@@ -728,8 +768,8 @@ CARDS.push(
 /* ══════════ 鋼 ══════════ */
 CARDS.push(
 {id:'ha01',nm:'鋼の歩哨',asp:'ha',rar:'常',
- o:{n:'鋼の歩哨',g:'哨',c:2,t:'u',a:1,h:4,kw:['盾']},
- u:{n:'抜き身の歩哨',g:'抜',c:2,t:'u',a:3,h:2}},
+ o:{n:'鋼の歩哨',g:'哨',c:2,t:'u',a:1,h:4,kw:['盾','二面']},
+ u:{n:'抜き身の歩哨',g:'抜',c:2,t:'u',a:3,h:2,kw:['二面']}},
 {id:'ha02',nm:'鍛冶の一撃',asp:'ha',rar:'常',
  o:{n:'鍛冶の一撃',g:'鍛',c:2,t:'s',tgt:'ally',fx:{on:'cast',op:'buffTarget',a:1,h:3},tx:'味方1体に+1/+3'},
  u:{n:'焼き入れ',g:'入',c:2,t:'s',tgt:'ally',fx:{on:'cast',op:'buffTarget',a:3,h:1,kw:'速攻'},tx:'味方1体に+3/+1と速攻'}},
@@ -744,7 +784,7 @@ CARDS.push(
  u:{n:'荷持ちの工',g:'荷',c:1,t:'u',a:0,h:2,kw:['盾'],fx:{on:'death',op:'draw',v:1},tx:'退場時：1枚引く'}},
 {id:'ha13',nm:'石工',asp:'ha',rar:'常',
  o:{n:'石工',g:'石',c:2,t:'u',a:1,h:3,fx:{on:'play',op:'healLeader',v:2},tx:'登場時：自分の命+2'},
- u:{n:'石垣積み',g:'垣',c:2,t:'u',a:2,h:2,kw:['盾']}},
+ u:{n:'石垣積み',g:'垣',c:3,t:'u',a:1,h:4,kw:['盾'],fx:{on:'play',op:'draw',v:1},tx:'登場時：1枚引く'}},
 {id:'ha14',nm:'楯持ち',asp:'ha',rar:'常',
  o:{n:'楯持ち',g:'楯',c:2,t:'u',a:0,h:4,kw:['重盾']},
  u:{n:'棘楯持ち',g:'棘',c:2,t:'u',a:2,h:2,kw:['反射']}},
@@ -755,30 +795,30 @@ CARDS.push(
  o:{n:'荷車の護衛',g:'衛',c:3,t:'u',a:2,h:4,kw:['遠当']},
  u:{n:'先手の護衛',g:'先',c:3,t:'u',a:4,h:2,kw:['盾']}},
 {id:'ha24',nm:'鋲打ち',asp:'ha',rar:'常',
- o:{n:'鋲打ち',g:'打',c:1,t:'u',a:1,h:2},
+ o:{n:'鋲打ち',g:'打',c:1,t:'u',a:2,h:1},
  u:{n:'当て金',g:'金',c:1,t:'u',a:0,h:3,kw:['反射']}},
 
 {id:'ha03',nm:'鉄壁の要',asp:'ha',rar:'珍',
- o:{n:'鉄壁の要',g:'鉄',c:4,t:'u',a:2,h:7,kw:['盾']},
- u:{n:'刃返しの要',g:'刃',c:3,t:'u',a:4,h:3,kw:['反射']}},
+ o:{n:'鉄壁の要',g:'鉄',c:4,t:'u',a:2,h:7,kw:['盾','二面'],fx:{on:'turn',op:'dmgLeader',v:1},tx:'自ターン開始時：相手の命に1'},
+ u:{n:'刃返しの要',g:'刃',c:3,t:'u',a:4,h:3,kw:['反射','二面']}},
 {id:'ha04',nm:'号令',asp:'ha',rar:'珍',
  o:{n:'号令',g:'号',c:3,t:'s',fx:{on:'cast',op:'buffAll',a:1,h:1},tx:'味方全てに+1/+1'},
  u:{n:'守れの令',g:'守',c:3,t:'s',fx:{on:'cast',op:'guardAll',v:3},tx:'味方全てに盾、自分の命+3'}},
 {id:'ha11',nm:'城塞の門',asp:'ha',rar:'珍',
- o:{n:'城塞の門',g:'門',c:3,t:'u',a:0,h:8,kw:['盾','反射']},
- u:{n:'破城の門',g:'破',c:3,t:'u',a:4,h:4}},
+ o:{n:'城塞の門',g:'門',c:3,t:'u',a:0,h:8,kw:['盾','反射','二面']},
+ u:{n:'破城の門',g:'破',c:3,t:'u',a:4,h:4,kw:['二面'],fx:{on:'play',op:'smiteFront'},tx:'登場時：正面にその力ぶんの傷'}},
 {id:'ha12',nm:'陣太鼓',asp:'ha',rar:'珍',
  o:{n:'陣太鼓',g:'陣',c:2,t:'s',fx:{on:'cast',op:'grantAll',kw:'速攻'},tx:'味方全てに速攻を与える'},
- u:{n:'鬨の声',g:'鬨',c:4,t:'s',fx:{on:'cast',op:'buffAll',a:2,h:0},tx:'味方全てに力+2'}},
+ u:{n:'鬨の声',g:'鬨',c:3,t:'s',fx:{on:'cast',op:'buffAll',a:2,h:0},tx:'味方全てに力+2'}},
 {id:'ha17',nm:'大鎚の戦士',asp:'ha',rar:'珍',
  o:{n:'大鎚の戦士',g:'鎚',c:4,t:'u',a:4,h:4,kw:['貫通']},
  u:{n:'重甲の戦士',g:'甲',c:3,t:'u',a:2,h:5,kw:['重盾']}},
 {id:'ha18',nm:'陣形変え',asp:'ha',rar:'珍',
- o:{n:'陣形変え',g:'形',c:2,t:'s',fx:{on:'cast',op:'extraMoves',v:2},tx:'このターン、陣替えをあと2回行える'},
+ o:{n:'返り討ち',g:'討',c:2,t:'s',tgt:'enemy',fx:{on:'cast',op:'smiteTarget'},tx:'敵1体にその力ぶんのダメージ'},
  u:{n:'土塁築き',g:'塁',c:2,t:'s',fx:{on:'cast',op:'buffAll',a:0,h:2},tx:'味方全てに耐久+2'}},
 {id:'ha19',nm:'不動の守将',asp:'ha',rar:'珍',
- o:{n:'不動の守将',g:'不',c:5,t:'u',a:3,h:7,kw:['重盾','不屈']},
- u:{n:'返しの守将',g:'返',c:4,t:'u',a:5,h:4,kw:['反射','遠当']}},
+ o:{n:'不動の守将',g:'不',c:5,t:'u',a:3,h:7,kw:['重盾','不屈','二面'],fx:{on:'flip',op:'buffAll',a:0,h:1},tx:'反転したとき：味方全てに耐久+1'},
+ u:{n:'返しの守将',g:'返',c:4,t:'u',a:5,h:4,kw:['反射','遠当','二面']}},
 
 {id:'ha06',nm:'鋼糸の傀儡師',asp:'ha',rar:'秘',
  o:{n:'鋼糸の傀儡師',g:'傀',c:5,t:'u',a:3,h:5,fx:{on:'turn',op:'buffOther',a:1,h:0},tx:'自ターン開始時：他の味方に力+1'},
@@ -791,13 +831,13 @@ CARDS.push(
  u:{n:'鋼の礎',g:'礎',c:4,t:'u',a:3,h:5,kw:['盾','成長']}},
 {id:'ha21',nm:'護りの陣',asp:'ha',rar:'秘',
  o:{n:'護りの陣',g:'護',c:4,t:'s',fx:{on:'cast',ops:[{op:'grantAll',kw:'重盾'},{op:'grantAll',kw:'結界'}]},tx:'味方全てに重盾と結界'},
- u:{n:'癒しの陣',g:'癒',c:3,t:'s',fx:{on:'cast',ops:[{op:'healAllAllies'},{op:'buffAll',a:1,h:1}]},tx:'味方全ての傷を癒し+1/+1'}},
+ u:{n:'癒しの陣',g:'癒',c:4,t:'s',fx:{on:'cast',ops:[{op:'healAllAllies'},{op:'buffAll',a:1,h:1},{op:'draw',v:1}]},tx:'味方の傷を癒し+1/+1、1枚引く'}},
 
 {id:'ha10',nm:'鋼帝・天叢',asp:'ha',rar:'極',
- o:{n:'鋼帝・天叢',g:'叢',c:8,t:'u',a:6,h:9,kw:['盾','反射']},
+ o:{n:'鋼帝・天叢',g:'叢',c:8,t:'u',a:6,h:9,kw:['盾','反射'],fx:{on:'play',op:'grantAll',kw:'反射'},tx:'登場時：味方全てに反射を与える'},
  u:{n:'鞘の天叢',g:'鞘',c:6,t:'u',a:4,h:6,kw:['盾'],fx:{on:'turn',op:'healLeader',v:2},tx:'自ターン開始時：自分の命+2'}},
 {id:'ha22',nm:'千手の甲冑',asp:'ha',rar:'極',
- o:{n:'千手の甲冑',g:'千',c:7,t:'u',a:5,h:8,kw:['重盾','反射','余波']},
+ o:{n:'千手の甲冑',g:'千',c:7,t:'u',a:5,h:8,kw:['重盾','反射','余波'],fx:{on:'turn',op:'dmgLeader',v:2},tx:'自ターン開始時：相手の命に2'},
  u:{n:'無手の甲冑',g:'無',c:5,t:'u',a:4,h:5,kw:['盾','成長','不屈']}},
 
 {id:'ha23',nm:'不壊・カンナビ',asp:'ha',rar:'神',
@@ -838,8 +878,8 @@ CARDS.push(
  o:{n:'落雷',g:'落',c:3,t:'s',tgt:'enemy',fx:{on:'cast',op:'dmgTarget',v:4},tx:'敵1体に4ダメージ'},
  u:{n:'遠雷',g:'遠',c:3,t:'s',fx:{on:'cast',ops:[{op:'dmgLeader',v:3},{op:'gainKi',v:1}]},tx:'相手の命に3、このターン気+1'}},
 {id:'ka10',nm:'逆巻く雷雲',asp:'ka',rar:'常',
- o:{n:'逆巻く雷雲',g:'雲',c:2,t:'u',a:2,h:1,kw:['余波']},
- u:{n:'たなびく雷雲',g:'棚',c:3,t:'u',a:2,h:4,kw:['不屈','反射']}},
+ o:{n:'逆巻く雷雲',g:'雲',c:2,t:'u',a:2,h:1,kw:['余波','二面']},
+ u:{n:'たなびく雷雲',g:'棚',c:3,t:'u',a:2,h:4,kw:['不屈','反射','二面']}},
 
 {id:'ka11',nm:'雷神の遣い',asp:'ka',rar:'珍',
  o:{n:'雷神の遣い',g:'遣',c:4,t:'u',a:4,h:3,kw:['連撃']},
@@ -848,8 +888,8 @@ CARDS.push(
  o:{n:'迅雷',g:'迅',c:4,t:'s',tgt:'enemy',fx:{on:'cast',ops:[{op:'dmgTarget',v:3},{op:'dmgLeader',v:2}]},tx:'敵1体に3、相手の命に2'},
  u:{n:'総駆け',g:'総',c:2,t:'s',fx:{on:'cast',ops:[{op:'grantAll',kw:'速攻'},{op:'buffAll',a:1,h:0}]},tx:'味方全てに速攻と力+1'}},
 {id:'ka13',nm:'帯電の巨獣',asp:'ka',rar:'珍',
- o:{n:'帯電の巨獣',g:'獣',c:5,t:'u',a:5,h:4,kw:['余波']},
- u:{n:'雷角の巨獣',g:'角',c:4,t:'u',a:3,h:4,kw:['連撃','遠当']}},
+ o:{n:'帯電の巨獣',g:'獣',c:5,t:'u',a:5,h:4,kw:['余波','二面']},
+ u:{n:'雷角の巨獣',g:'角',c:4,t:'u',a:3,h:4,kw:['連撃','遠当','二面']}},
 {id:'ka14',nm:'雷光の巫女',asp:'ka',rar:'珍',
  o:{n:'雷光の巫女',g:'光',c:4,t:'u',a:3,h:3,fx:{on:'play',ops:[{op:'draw',v:2},{op:'gainKi',v:2}]},tx:'登場時：2枚引き、気+2'},
  u:{n:'雷火の巫女',g:'火',c:3,t:'u',a:2,h:3,fx:{on:'play',ops:[{op:'dmgAllEnemy',v:1},{op:'dmgLeader',v:1}]},tx:'登場時：敵全てに1、相手の命に1'}},
@@ -857,8 +897,8 @@ CARDS.push(
  o:{n:'雷槌',g:'槌',c:3,t:'s',tgt:'enemy',fx:{on:'cast',ops:[{op:'destroyTarget'},{op:'dmgSelf',v:3}]},tx:'敵1体を破壊し、自分の命-3'},
  u:{n:'天の裁き',g:'裁',c:5,t:'s',tgt:'enemy',fx:{on:'cast',op:'destroyTarget'},tx:'敵1体を破壊する'}},
 {id:'ka16',nm:'雷を纏う者',asp:'ka',rar:'珍',
- o:{n:'雷を纏う者',g:'纏',c:3,t:'u',a:2,h:2,kw:['速攻','成長']},
- u:{n:'雷を放つ者',g:'撃',c:4,t:'u',a:4,h:4,kw:['貫通']}},
+ o:{n:'雷を纏う者',g:'纏',c:3,t:'u',a:2,h:2,kw:['速攻','成長','二面'],fx:{on:'flip',op:'gainKi',v:2},tx:'反転したとき：このターン気+2'},
+ u:{n:'雷を放つ者',g:'撃',c:4,t:'u',a:4,h:4,kw:['貫通','二面']}},
 {id:'ka17',nm:'天鼓',asp:'ka',rar:'珍',
  o:{n:'天鼓',g:'鼓',c:5,t:'s',fx:{on:'cast',op:'dmgLeader',v:6},tx:'相手の命に6ダメージ'},
  u:{n:'小鼓',g:'小',c:2,t:'s',fx:{on:'cast',ops:[{op:'dmgLeader',v:2},{op:'draw',v:1}]},tx:'相手の命に2、1枚引く'}},
@@ -902,10 +942,10 @@ CARDS.push(
  o:{n:'蔦の兵',g:'蔦',c:2,t:'u',a:1,h:2,kw:['成長']},
  u:{n:'棘の兵',g:'棘',c:2,t:'u',a:3,h:1,kw:['遠当']}},
 {id:'tu04',nm:'苔むす石',asp:'tu',rar:'常',
- o:{n:'苔むす石',g:'苔',c:3,t:'u',a:0,h:5,kw:['重盾']},
- u:{n:'転がる石',g:'転',c:2,t:'u',a:2,h:3,kw:['不屈']}},
+ o:{n:'苔むす石',g:'苔',c:3,t:'u',a:0,h:5,kw:['重盾','二面']},
+ u:{n:'転がる石',g:'転',c:2,t:'u',a:2,h:3,kw:['不屈','二面']}},
 {id:'tu05',nm:'木漏れ日',asp:'tu',rar:'常',
- o:{n:'木漏れ日',g:'陽',c:1,t:'s',fx:{on:'cast',op:'healLeader',v:4},tx:'自分の命+4'},
+ o:{n:'木漏れ日',g:'陽',c:1,t:'s',fx:{on:'cast',op:'healLeader',v:3},tx:'自分の命+3'},
  u:{n:'夕立',g:'雨',c:1,t:'s',fx:{on:'cast',op:'healAllAllies'},tx:'味方全ての傷を癒す'}},
 {id:'tu06',nm:'里の薬師',asp:'tu',rar:'常',
  o:{n:'里の薬師',g:'薬',c:2,t:'u',a:1,h:2,fx:{on:'play',op:'healLeader',v:3},tx:'登場時：自分の命+3'},
@@ -917,15 +957,15 @@ CARDS.push(
  o:{n:'蔓引きの兵',g:'蔓',c:3,t:'u',a:2,h:4,kw:['反射']},
  u:{n:'枝打ちの兵',g:'枝',c:3,t:'u',a:4,h:2,kw:['貫通']}},
 {id:'tu09',nm:'森の小鬼',asp:'tu',rar:'常',
- o:{n:'森の小鬼',g:'鬼',c:1,t:'u',a:2,h:1},
+ o:{n:'森の小鬼',g:'鬼',c:1,t:'u',a:2,h:1,kw:['速攻']},
  u:{n:'苗を抱く鬼',g:'苗',c:1,t:'u',a:1,h:2,fx:{on:'death',op:'summonHere',tok:'t_me'},tx:'退場時：同じ列に芽(1/1成長)'}},
 {id:'tu10',nm:'根張り',asp:'tu',rar:'常',
  o:{n:'根張り',g:'根',c:1,t:'s',tgt:'ally',fx:{on:'cast',op:'buffTarget',a:0,h:3,kw:'不屈'},tx:'味方1体に+0/+3と不屈'},
  u:{n:'幹太り',g:'幹',c:2,t:'s',tgt:'ally',fx:{on:'cast',op:'grantTarget',kw:'重盾'},tx:'味方1体に重盾を与える'}},
 
 {id:'tu11',nm:'大樹の守り手',asp:'tu',rar:'珍',
- o:{n:'大樹の守り手',g:'樹',c:4,t:'u',a:2,h:5,kw:['重盾','成長']},
- u:{n:'若木の守り手',g:'若',c:3,t:'u',a:4,h:3,kw:['成長']}},
+ o:{n:'大樹の守り手',g:'樹',c:4,t:'u',a:2,h:5,kw:['重盾','成長','二面'],fx:{on:'flip',op:'healLeader',v:2},tx:'反転したとき：自分の命+2'},
+ u:{n:'若木の守り手',g:'若',c:3,t:'u',a:4,h:3,kw:['成長','二面']}},
 {id:'tu12',nm:'蔦の絡繰',asp:'tu',rar:'珍',
  o:{n:'蔦の絡繰',g:'絡',c:3,t:'u',a:3,h:3,fx:{on:'play',op:'buffOther',a:1,h:1},tx:'登場時：他の味方に+1/+1'},
  u:{n:'棘の絡繰',g:'繰',c:4,t:'u',a:2,h:5,kw:['反射','成長']}},
@@ -942,8 +982,8 @@ CARDS.push(
  o:{n:'蔦刈り',g:'刈',c:3,t:'s',tgt:'enemy',fx:{on:'cast',ops:[{op:'dmgTarget',v:3},{op:'healLeader',v:3}]},tx:'敵1体に3、自分の命+3'},
  u:{n:'蔓縛り',g:'縛',c:2,t:'s',tgt:'enemy',fx:{on:'cast',op:'zeroTarget'},tx:'敵1体の力を0にする'}},
 {id:'tu17',nm:'巨蔦の腕',asp:'tu',rar:'珍',
- o:{n:'巨蔦の腕',g:'腕',c:5,t:'u',a:4,h:5,kw:['貫通','成長']},
- u:{n:'巨蔦の盾',g:'盾',c:4,t:'u',a:2,h:7,kw:['重盾']}},
+ o:{n:'巨蔦の腕',g:'腕',c:5,t:'u',a:4,h:5,kw:['貫通','成長','二面']},
+ u:{n:'巨蔦の盾',g:'盾',c:4,t:'u',a:2,h:7,kw:['重盾','二面']}},
 
 {id:'tu18',nm:'世界樹の若木',asp:'tu',rar:'秘',
  o:{n:'世界樹の若木',g:'界',c:5,t:'u',a:3,h:6,kw:['成長','結界']},
@@ -997,8 +1037,8 @@ CARDS.push(
  o:{n:'野盗',g:'盗',c:2,t:'u',a:3,h:1},
  u:{n:'物見の野盗',g:'物',c:3,t:'u',a:2,h:3,kw:['遠当']}},
 {id:'nu12',nm:'石橋',asp:'nu',rar:'常',
- o:{n:'石橋',g:'橋',c:2,t:'u',a:0,h:5,kw:['盾']},
- u:{n:'渡れる石橋',g:'渡',c:3,t:'u',a:3,h:3,kw:['不屈']}},
+ o:{n:'石橋',g:'橋',c:2,t:'u',a:0,h:5,kw:['盾','二面']},
+ u:{n:'渡れる石橋',g:'渡',c:3,t:'u',a:3,h:3,kw:['不屈','二面']}},
 {id:'nu13',nm:'見物人',asp:'nu',rar:'常',
  o:{n:'見物人',g:'見',c:1,t:'u',a:0,h:2,fx:{on:'death',op:'draw',v:1},tx:'退場時：1枚引く'},
  u:{n:'野次馬',g:'野',c:2,t:'u',a:2,h:1,kw:['速攻']}},
@@ -1214,7 +1254,7 @@ function startBattle(gate, deck){
   logM('対局開始。'+gate.who+'（命'+gate.life+'）');
   beginTurn(0);
 }
-function logM(t){ if(SIM) return; B.log.push(t); if(B.log.length>40) B.log.shift(); }
+function logM(t){ if(SIM) return; B.log.push({n:B.turn,s:B.cur,m:t}); if(B.log.length>160) B.log.shift(); }
 
 function drawCard(s,silent){
   const P=B.p[s];
@@ -1300,6 +1340,7 @@ function flipUnit(u){
   u.ghost=(F.kw||[]).indexOf('幻')>=0 || u.kw.indexOf('幻')>=0;
   fxText(u.side,'反転',u); sfx('flip');
   logM(F.n+'へ反転した');
+  if(F.fx&&F.fx.on==='flip') runFx(F.fx,{s:u.side,u,lane:u.lane});
 }
 function twoFace(u){
   if(!u) return false;
@@ -1482,6 +1523,8 @@ function runOp(fx,c){
           P.hand.push({cid:P.dead.splice(rnd(P.dead.length),1)[0],uid:UID++}); break; }
     /* 対象を取るもの */
     case 'dmgTarget': damageUnit(T,v,null); break;
+    case 'smiteTarget': if(T) damageUnit(T,atkOf(T),null); break;
+    case 'smiteFront': if(front) damageUnit(front,atkOf(front),null); break;
     case 'destroyTarget': case 'sacTarget': destroy(T); break;
     case 'zeroTarget': if(T) T.ab=-faceOf(T).a; break;
     case 'swapTarget': swapStats(T); break;
@@ -1533,7 +1576,7 @@ function startVersus(dA,dB,nameA,nameB){
 }
 function fullSnap(){
   return {p:B.p,cur:B.cur,turn:B.turn,over:B.over,winner:B.winner,resigned:B.resigned,
-    gate:B.gate,names:B.names,log:B.log.slice(-8),versus:1,uid:UID};
+    gate:B.gate,names:B.names,log:B.log.slice(-60),versus:1,uid:UID};
 }
 function fullRestore(o){
   B={p:o.p,cur:o.cur,turn:o.turn,over:o.over,winner:o.winner,resigned:o.resigned,
@@ -1557,7 +1600,7 @@ function aiDeck(gate){
 /* ============ 思考ルーチン ============ */
 let SIM=false;
 const KWV={'速攻':1.1,'貫通':1.0,'盾':1.3,'重盾':2.2,'反射':1.1,'吸命':1.2,'幻':1.7,'再起':2.8,
-  '二面':0.7,'連撃':2.2,'遠当':1.5,'毒手':2.3,'成長':1.9,'余波':1.0,'不屈':0.5,'結界':1.6};
+  '二面':1.1,'連撃':2.2,'遠当':1.5,'毒手':2.3,'成長':1.9,'余波':1.0,'不屈':0.5,'結界':1.6};
 
 function cloneUnit(u){ return {uid:u.uid,cid:u.cid,face:u.face,dmg:u.dmg,ab:u.ab,hb:u.hb,
   kw:u.kw.slice(),ready:u.ready,frozen:u.frozen,ghost:u.ghost,reborn:u.reborn,side:u.side,lane:u.lane}; }
@@ -1576,6 +1619,7 @@ function unitScore(u){
   const f=faceOf(u);
   if(f.fx&&f.fx.on==='turn') v+=2.2;
   if(f.fx&&f.fx.on==='death') v+=0.8;
+  if(twoFace(u)){ const o=BYID[u.cid][u.face==='o'?'u':'o']; if(o.fx&&o.fx.on==='flip') v+=1.2; }
   return v;
 }
 function evalBoard(me){
@@ -2106,7 +2150,7 @@ function sheet(html,sticky){
   $('veil').classList.add('on');
   $('veil').classList.toggle('solid',!!sticky);
 }
-function closeSheet(){ STICKY=false; $('veil').classList.remove('on','solid'); }
+function closeSheet(){ STICKY=false; $('veil').classList.remove('on','solid'); $('sheet').innerHTML=''; }
 $('veil').addEventListener('click',e=>{ if(e.target.id==='veil'&&!STICKY) closeSheet(); });
 const wait=ms=>new Promise(r=>setTimeout(r,ms));
 function copyText(id){
@@ -2434,6 +2478,8 @@ function drawShop(){
     <p class="muted">門を初めて突破：120＋門の数×15魂片と、秘以上を1枚（十以降は極以上）。再挑戦で勝利：40／敗北：12。<br>
       すでに上限まで持っている札が出た場合は魂片に戻ります。これまでに開けた封：${S.opened}</p>`;
 }
+/* ── 封を切る（なぞって破り、1枚ずつめくる） ── */
+const PK={kind:null,cards:[],i:0,phase:'seal',refund:0,x0:0,y0:0,drag:0,dragging:false,flipped:false};
 function openPack(kind){
   const P=PACKS[kind]||PACKS.fu;
   if(S.souls<P.cost) return toast('魂片が足りません');
@@ -2441,15 +2487,123 @@ function openPack(kind){
   const got=drawPack(kind); let refund=0;
   got.forEach(c=>{ if(ownedCount(c.id)>=copyCap(c)) refund+=RAR[c.rar].v; else addCard(c.id,1); });
   S.souls+=refund; save();
-  const best=got.slice().sort((a,b)=>RAR[b.rar].v-RAR[a.rar].v)[0];
-  sfx(RAR[best.rar].v>=50?'win':'card');
-  const cards=got.map((c,i)=>`<div style="animation-delay:${i*.09}s">${cardHTML(c,'o',{attr:`onclick="cardDetail(BYID['${c.id}'])"`})}</div>`).join('');
-  sheet(`<h3>${P.nm}を切った</h3><div class="crumb">最上位：${best.rar}「${esc(best.nm)}」</div>
+  PK.kind=kind; PK.cards=got; PK.i=0; PK.phase='seal'; PK.refund=refund;
+  PK.drag=0; PK.dragging=false; PK.flipped=false; PK.busy=false;
+  packRender();
+}
+function packDots(){
+  return `<div class="packrow">`+PK.cards.map((c,i)=>{
+    const done=i<PK.i;
+    return `<div class="pdot ${done?'done':''}" style="color:${RAR[c.rar].c};${done?'background:'+RAR[c.rar].c+';border-color:'+RAR[c.rar].c:''}">${done?c.o.g:'？'}</div>`;
+  }).join('')+`</div>`;
+}
+function packRender(){
+  const P=PACKS[PK.kind]||PACKS.fu;
+  if(PK.phase==='seal'){
+    sheet(`<div class="packstage">
+      <div class="packhead">${P.nm}　${P.n}枚</div>
+      <div class="wrapper big" id="packwrap"><div class="seal">${P.nm[0]}</div><div class="slit" id="packslit"></div></div>
+      <div class="tearhint"><b>指でなぞって</b>封を切る</div>
+      <button class="btn sm ghost" onclick="packTear()">なぞらずに開ける</button>
+    </div>`,true);
+    const wr=$('packwrap');
+    if(wr){
+      wr.addEventListener('pointerdown',packDown);
+      wr.addEventListener('pointermove',packMove);
+      wr.addEventListener('pointerup',packUp);
+      wr.addEventListener('pointercancel',packUp);
+      wr.addEventListener('touchstart',packDown,{passive:false});
+      wr.addEventListener('touchmove',packMove,{passive:false});
+      wr.addEventListener('touchend',packUp);
+    }
+    return;
+  }
+  if(PK.phase==='cards'){
+    const c=PK.cards[PK.i];
+    const hi=RAR[c.rar].v>=50;
+    sheet(`<div class="packstage">
+      <div class="packhead">${PK.i+1} / ${PK.cards.length}</div>
+      <div class="pstage" id="pstage">
+        <div class="burst" id="pburst" style="background:radial-gradient(circle,${RAR[c.rar].c}cc,transparent 68%)"></div>
+        <div class="pflip ${PK.flipped?'on':''}" id="pflip">
+          <div class="pf b">${backHTML().replace('class="card back"','class="card back" style="width:176px;height:258px"')}</div>
+          <div class="pf f">${cardHTML(c,'o',{big:1})}</div>
+        </div>
+      </div>
+      ${packDots()}
+      <div class="tearhint">${PK.flipped?'<b>もう一度</b>で次の札へ':'<b>触れて</b>めくる'}</div>
+      <div style="display:flex;gap:8px">
+        <button class="btn sm ghost" onclick="packAll()">全部めくる</button>
+        <button class="btn sm" onclick="packStep()">${PK.flipped?'次へ':'めくる'}</button>
+      </div>
+    </div>`,true);
+    const st=$('pstage');
+    if(st){ st.addEventListener('pointerup',packStep); st.addEventListener('touchend',e=>{e.preventDefault();packStep();},{passive:false}); }
+    return;
+  }
+  /* 開け終わり */
+  const best=PK.cards.slice().sort((a,b)=>RAR[b.rar].v-RAR[a.rar].v)[0];
+  const cards=PK.cards.map((c,i)=>`<div style="animation-delay:${i*.07}s">${cardHTML(c,'o',{attr:`onclick="cardDetail(BYID['${c.id}'])"`})}</div>`).join('');
+  sheet(`<h3>${P.nm}を切った</h3><div class="crumb">最上位：<span style="color:${RAR[best.rar].c}">${best.rar}</span>「${esc(best.nm)}」</div>
     <div class="reveal" style="margin-top:14px">${cards}</div>
-    ${refund?`<p class="muted" style="text-align:center;margin-top:12px">上限ぶん ${refund} 魂片が戻りました。</p>`:''}
-    <button class="btn wide solid" style="margin-top:14px" onclick="closeSheet();drawShop()">しまう</button>`);
+    ${PK.refund?`<p class="muted" style="text-align:center;margin-top:12px">上限ぶん ${PK.refund} 魂片が戻りました。</p>`:''}
+    <div style="display:flex;gap:8px;margin-top:14px">
+      <button class="btn sm" style="flex:1" ${S.souls<P.cost?'disabled':''} onclick="openPack('${PK.kind}')">もう一封（${P.cost}）</button>
+      <button class="btn sm solid" style="flex:1" onclick="closeSheet();drawShop()">しまう</button>
+    </div>`);
   drawShop();
 }
+function pxy(e){
+  if(e.touches&&e.touches[0]) return [e.touches[0].clientX,e.touches[0].clientY];
+  if(e.changedTouches&&e.changedTouches[0]) return [e.changedTouches[0].clientX,e.changedTouches[0].clientY];
+  return [e.clientX||0,e.clientY||0];
+}
+function packDown(e){ const p=pxy(e); PK.x0=p[0]; PK.y0=p[1]; PK.drag=0; PK.dragging=true; }
+function packMove(e){
+  if(!PK.dragging||PK.phase!=='seal') return;
+  if(e.cancelable) e.preventDefault();
+  const p=pxy(e);
+  PK.drag=Math.max(PK.drag,Math.abs(p[0]-PK.x0)+Math.abs(p[1]-PK.y0)*0.35);
+  const wr=$('packwrap'); if(!wr) return;
+  const w=wr.offsetWidth||196, r=Math.min(1,PK.drag/(w*0.62));
+  const sl=$('packslit'); if(sl) sl.style.height=(r*13)+'px';
+  if(r>=1){ PK.dragging=false; packTear(); }
+}
+function packUp(){
+  if(PK.phase!=='seal') return;
+  PK.dragging=false;
+  const wr=$('packwrap'), sl=$('packslit');
+  if(sl) sl.style.height='0px';
+  if(wr&&PK.drag>4){ wr.classList.add('shake'); setTimeout(()=>wr&&wr.classList.remove('shake'),320); }
+  PK.drag=0;
+}
+function packTear(){
+  if(PK.phase!=='seal') return;
+  PK.phase='cards'; PK.i=0; PK.flipped=false;
+  const wr=$('packwrap');
+  sfx('flip');
+  if(wr){ wr.classList.add('torn'); setTimeout(packRender,430); }
+  else packRender();
+}
+function packStep(){
+  if(PK.phase!=='cards'||PK.busy) return;
+  if(!PK.flipped){
+    PK.flipped=true;
+    const fl=$('pflip'); if(fl) fl.classList.add('on');
+    const c=PK.cards[PK.i], hi=RAR[c.rar].v>=50;
+    sfx(hi?'win':'card');
+    if(hi){ const b=$('pburst'); if(b){ b.classList.add('on'); setTimeout(()=>b&&b.classList.remove('on'),950); } }
+    const hint=$('sheet').querySelector('.tearhint');
+    if(hint) hint.innerHTML='<b>もう一度</b>で次の札へ';
+    return;
+  }
+  const st=$('pstage');
+  PK.busy=true;
+  const go=()=>{ PK.busy=false; PK.i++; PK.flipped=false;
+    PK.phase = PK.i>=PK.cards.length ? 'done':'cards'; packRender(); };
+  if(st){ st.classList.add('gone'); setTimeout(go,300); } else go();
+}
+function packAll(){ PK.busy=false; PK.i=PK.cards.length; PK.phase='done'; sfx('card'); packRender(); }
 function grantRare(minRar){
   const ok=minRar==='極'?['極','神']:['秘','極','神'];
   let pool=CARDS.filter(c=>ok.indexOf(c.rar)>=0&&ownedCount(c.id)<copyCap(c));
@@ -2555,7 +2709,10 @@ function drawRules(){
       <p>相手の<b>命</b>を0にすれば勝ち。自分の命は20から始まる。</p></div>
     <div class="rulesec"><h3>表と裏</h3>
       <p>全${CARDS.length}種の札すべてに表と裏があり、出すときにどちらかを選ぶ。名前も、気の値も、力も、能力も別物になる。</p>
-      <p>場に出た後も「反転」効果でひっくり返る。<b>受けた傷はそのまま引き継ぐ</b>ので、耐久の低い面へ返されると一撃で落ちる。</p></div>
+      <p>場に出た後も「反転」効果でひっくり返る。<b>受けた傷はそのまま引き継ぐ</b>ので、耐久の低い面へ返されると一撃で落ちる。
+        逆に、瀕死の攻め手を硬い面へ返すのは実質の回復になる。ここがこの遊びの芯。</p>
+      <p><span class="kw">二面</span>を持つ札は、場で1気を払えば自分から反転できる。26種ある。
+        中には<b>「反転したとき」</b>に効果が出る札もあり、行き来そのものが手になる。</p></div>
     <div class="rulesec"><h3>気脈</h3>
       <p>使える気は自然には増えない。<b>自分のターンに手札から1枚、気脈に伏せる</b>と最大の気が1増える（上限10）。</p>
       <p>毎ターン「1枚を燃料にするか、戦力として使うか」を選び続けることになる。これがこのゲームの背骨。</p></div>
@@ -2636,6 +2793,30 @@ function pendingHTML(){
     <button class="btn sm ghost" onclick="cancelMode()">やめる</button></div>`;
 }
 function cancelMode(){ clearUI(); render(); }
+function logSheet(all){
+  if(!B||!B.log.length) return;
+  const g=[];
+  B.log.forEach(x=>{
+    const last=g[g.length-1];
+    if(last&&last.n===x.n&&last.s===x.s) last.a.push(x.m);
+    else g.push({n:x.n,s:x.s,a:[x.m]});
+  });
+  const show = all ? g : g.slice(-6);
+  const body = show.map(t=>{
+    const mine=t.s===ME;
+    return `<div class="logturn"><div class="t ${mine?'':'foe'}">${t.n}巡目・${esc(mine?'自分':sideName(t.s))}</div><div class="ln"></div></div>`
+      + t.a.map(m=>`<div class="logline ${mine?'':'foe'}">${esc(m)}</div>`).join('');
+  }).join('');
+  sheet(`<h3>戦さの記録</h3>
+    <div class="crumb">${all?'この対局の全て':'直近'+show.length+'手番'}（${B.log.length}件）</div>
+    <div style="max-height:56vh;overflow:auto;margin-top:10px">${body}</div>
+    <div style="display:flex;gap:8px;margin-top:12px">
+      ${(!all&&g.length>show.length)?`<button class="btn sm" style="flex:1" onclick="logSheet(1)">最初から全部見る</button>`:''}
+      <button class="btn sm solid" style="flex:1" onclick="closeSheet()">盤に戻る</button>
+    </div>`);
+  const box=$('sheet').querySelector('div[style*="overflow:auto"]');
+  if(box) box.scrollTop=box.scrollHeight;
+}
 function myTurn(){ return B&&!B.over&&B.cur===ME&&!HIDE&&(MODE!=='net'||NET.on); }
 function render(){
   if(!B) return;
@@ -2664,7 +2845,8 @@ function render(){
    <div class="hand">${handHTML()}</div>
    <div class="battlebar">
      <button class="sndsm on" onclick="battleMenu()" title="メニュー（音・降参）">≡</button>
-     <div class="log">${B.log.slice(-2).map(esc).join('<br>')}</div>
+     <div class="log" onclick="logSheet()" tabindex="0" data-tap="1" role="button"
+       title="これまでの流れを見る">${B.log.slice(-2).map(x=>esc(x.m)).join('<br>')}<span class="more">…</span></div>
      ${UI.mode?'<button class="btn sm ghost" onclick="cancelMode()">取り消し</button>':
        `<button class="btn sm ${me.buried||me.kiMax>=10||!mt?'ghost':''}" ${me.buried||me.kiMax>=10||!mt?'disabled':''} onclick="tapBury()">気脈に伏せる</button>`}
      <button class="btn sm solid" ${mt?'':'disabled'} onclick="tapEnd()">手番を終える</button>
