@@ -191,6 +191,16 @@ body.in-battle #nav{display:none}
   background-size:280% 100%;animation:sheen 3.6s linear infinite}
 @keyframes sheen{from{background-position:280% 0}to{background-position:-80% 0}}
 .raritybar{display:flex;gap:5px;flex-wrap:wrap;margin:8px 0 2px}
+/* 言葉でしぼる */
+.kwbar{display:flex;gap:4px;flex-wrap:wrap;margin:6px 0 2px}
+.kwchip{font-family:var(--mincho);font-size:11.5px;letter-spacing:.06em;padding:4px 9px;
+  border:1px solid #3a3229;border-radius:var(--r);color:var(--gray);white-space:nowrap}
+.kwchip.on{border-color:var(--kin);color:var(--kin-hi);background:rgba(198,161,91,.13)}
+.kwtoggle{display:flex;align-items:center;gap:8px;margin-top:10px}
+.kwtoggle .now{font-family:var(--mincho);font-size:12px;color:var(--kin-hi)}
+.facetag2{font-family:var(--mincho);font-size:10px;padding:0 4px;border-radius:2px;margin-left:4px;
+  border:1px solid currentColor;white-space:nowrap}
+.facetag2.o{color:#d1543f}.facetag2.u{color:#6ea8cf}.facetag2.b{color:var(--kin)}
 .card.locked{filter:grayscale(.85) brightness(.58);cursor:pointer}
 .card.locked:hover{filter:grayscale(.4) brightness(.8)}
 .card .own{position:absolute;top:29px;right:6px;font-family:var(--mincho);font-size:11px;font-weight:800;
@@ -2444,8 +2454,35 @@ function leaveVersus(){
   MODE='solo'; ME=0; HIDE=false; clearUI(); closeSheet(); go('gates');
 }
 
+/* ── 言葉でしぼる（速攻・毒手など） ── */
+const KWFILT=['all'].concat(Object.keys(KWTX)).concat(['術','ユニット','効果あり']);
+function faceHas(F,k){
+  if(k==='術') return F.t==='s';
+  if(k==='ユニット') return F.t==='u';
+  if(k==='効果あり') return !!F.fx;
+  return (F.kw||[]).indexOf(k)>=0;
+}
+function cardHas(c,k){ return k==='all'||faceHas(c.o,k)||faceHas(c.u,k); }
+function kwWhere(c,k){
+  if(k==='all') return '';
+  const a=faceHas(c.o,k), b=faceHas(c.u,k);
+  if(a&&b) return '<span class="facetag2 b">両面</span>';
+  if(a) return '<span class="facetag2 o">表</span>';
+  if(b) return '<span class="facetag2 u">裏</span>';
+  return '';
+}
+function kwBar(cur,fn,open){
+  if(!open) return `<div class="kwtoggle">
+    <button class="btn sm ghost" onclick="${fn}('open')">言葉でしぼる ▾</button>
+    ${cur!=='all'?`<span class="now">${cur}</span><button class="btn sm ghost" onclick="${fn}('all')">解除</button>`:''}
+  </div>`;
+  return `<div class="kwtoggle"><button class="btn sm" onclick="${fn}('close')">言葉でしぼる ▴</button></div>
+    <div class="kwbar">`+KWFILT.map(k=>
+      `<button class="kwchip ${cur===k?'on':''}" onclick="${fn}('${k}')">${k==='all'?'指定なし':k}</button>`).join('')+`</div>`;
+}
+
 /* ============ 蔵 ============ */
-let COLLA='all', COLLR='all', COLLH='all';
+let COLLA='all', COLLR='all', COLLH='all', COLLK='all', COLLKO=false;
 function drawColl(){
   const ak=['all'].concat(ASPLIST,['nu']);
   const atabs=ak.map(k=>`<button class="asel ${COLLA===k?'on':''}" onclick="COLLA='${k}';drawColl()">${k==='all'?'全て':ASP[k].n}</button>`).join('');
@@ -2453,7 +2490,7 @@ function drawColl(){
   const rtabs=rk.map(k=>`<button class="asel ${COLLR===k?'on':''}" onclick="COLLR='${k}';drawColl()">${k==='all'?'全位':k}</button>`).join('');
   const hk=[['all','全部'],['have','持っている'],['none','まだ無い']];
   const htabs=hk.map(k=>`<button class="asel ${COLLH===k[0]?'on':''}" onclick="COLLH='${k[0]}';drawColl()">${k[1]}</button>`).join('');
-  const base=CARDS.filter(c=>(COLLA==='all'||c.asp===COLLA)&&(COLLR==='all'||c.rar===COLLR));
+  const base=CARDS.filter(c=>(COLLA==='all'||c.asp===COLLA)&&(COLLR==='all'||c.rar===COLLR)&&cardHas(c,COLLK));
   const list=base.filter(c=>COLLH==='all'||(COLLH==='have'?ownedCount(c.id)>0:ownedCount(c.id)===0));
   const have=base.filter(c=>ownedCount(c.id)>0).length;
   const grid=list.map(c=>{
@@ -2468,9 +2505,15 @@ function drawColl(){
     <div class="aspbar">${atabs}</div>
     <div class="raritybar">${rtabs}</div>
     <div class="raritybar">${htabs}</div>
-    <p class="muted" style="margin:6px 0 12px">全${CARDS.length}種・各2面で${CARDS.length*2}通りの顔。所持は${collSize()}種。
+    ${kwBar(COLLK,'collKw',COLLKO)}
+    <p class="muted" style="margin:6px 0 12px">${COLLK!=='all'?`<b style="color:var(--kin-hi)">${COLLK}</b>を持つ札：${base.length}種　`:''}全${CARDS.length}種・各2面で${CARDS.length*2}通りの顔。所持は${collSize()}種。
       <b>まだ持っていない札もタップすれば表裏の効果を読めます。</b></p>
     <div class="grid">${grid}</div>`;
+}
+
+function collKw(k){
+  if(k==='open'){ COLLKO=true; } else if(k==='close'){ COLLKO=false; } else { COLLK=k; COLLKO=false; }
+  drawColl();
 }
 
 /* ============ 封札 ============ */
@@ -2654,7 +2697,7 @@ function grantRare(minRar){
 }
 
 /* ============ 組札 ============ */
-let DECKTAB='in', POOLA='all';
+let DECKTAB='in', POOLA='all', POOLK='all', POOLKO=false;
 const DECKSLOTS=6;
 function drawDeck(){
   const d=ensureDeck(), n=deckCount(d);
@@ -2670,17 +2713,21 @@ function drawDeck(){
     const used=d.cards[C.id]||0, cap=usable(C.id);
     return `<div class="dkline" style="${!inDeck&&used>=cap?'opacity:.42':''}">
       <div class="c">${minCost(C)}</div>
-      <div class="n" onclick="cardDetail(BYID['${C.id}'])">${esc(C.nm)}<span style="color:var(--gray);font-size:11px"> ${ASP[C.asp].n}・<span style="color:${RAR[C.rar].c}">${C.rar}</span></span></div>
+      <div class="n" onclick="cardDetail(BYID['${C.id}'])">${esc(C.nm)}<span style="color:var(--gray);font-size:11px"> ${ASP[C.asp].n}・<span style="color:${RAR[C.rar].c}">${C.rar}</span></span>${kwWhere(C,POOLK)}</div>
       <div class="q" ${inDeck?'':'style="color:var(--gray)"'}>${inDeck?'×'+used:used+'/'+cap}</div>
       ${inDeck?`<button class="btn sm ghost" onclick="deckAdj('${C.id}',-1)">－</button>`:''}
       <button class="btn sm" onclick="deckAdj('${C.id}',1)">＋</button></div>`;
   };
-  const inRows=Object.keys(d.cards).sort((a,b)=>minCost(BYID[a])-minCost(BYID[b])||BYID[a].nm.localeCompare(BYID[b].nm))
-    .map(k=>row(BYID[k],true)).join('') || '<p class="muted">まだ1枚も入っていません。</p>';
+  const inKeys=Object.keys(d.cards).filter(k=>cardHas(BYID[k],POOLK))
+    .sort((a,b)=>minCost(BYID[a])-minCost(BYID[b])||BYID[a].nm.localeCompare(BYID[b].nm));
+  const inRows=inKeys.map(k=>row(BYID[k],true)).join('')
+    || `<p class="muted">${POOLK==='all'?'まだ1枚も入っていません。':POOLK+'を持つ札は入っていません。'}</p>`;
   const pk=['all'].concat(d.asp,['nu']);
   const ptabs=pk.map(k=>`<button class="asel ${POOLA===k?'on':''}" onclick="POOLA='${k}';drawDeck()">${k==='all'?'全て':ASP[k].n}</button>`).join('');
-  const pool=CARDS.filter(c=>ownedCount(c.id)>0&&legalIn(c,d.asp)&&(POOLA==='all'||c.asp===POOLA))
-    .sort((a,b)=>minCost(a)-minCost(b)||a.nm.localeCompare(b.nm)).map(C=>row(C,false)).join('');
+  const poolCards=CARDS.filter(c=>ownedCount(c.id)>0&&legalIn(c,d.asp)&&(POOLA==='all'||c.asp===POOLA)&&cardHas(c,POOLK))
+    .sort((a,b)=>minCost(a)-minCost(b)||a.nm.localeCompare(b.nm));
+  const pool=poolCards.map(C=>row(C,false)).join('')
+    || `<p class="muted">${POOLK}を持つ札は、この相の蔵にありません。</p>`;
 
   $('screen-deck').innerHTML=`
     <div class="topbar"><h2>組札</h2><div class="spacer"></div>
@@ -2705,7 +2752,13 @@ function drawDeck(){
       <button class="asel ${DECKTAB==='pool'?'on':''}" onclick="DECKTAB='pool';drawDeck()">蔵から足す</button>
     </div>
     ${DECKTAB==='pool'?`<div class="raritybar">${ptabs}</div>`:''}
+    ${kwBar(POOLK,'poolKw',POOLKO)}
+    ${POOLK!=='all'?`<p class="muted" style="margin:6px 0 0"><b style="color:var(--kin-hi)">${POOLK}</b>：${KWTX[POOLK]||''}　該当${DECKTAB==='in'?inKeys.length:poolCards.length}種</p>`:''}
     <div style="margin-top:6px">${DECKTAB==='in'?inRows:pool}</div>`;
+}
+function poolKw(k){
+  if(k==='open'){ POOLKO=true; } else if(k==='close'){ POOLKO=false; } else { POOLK=k; POOLKO=false; }
+  drawDeck();
 }
 function pickDeck(i){ S.active=i; POOLA='all'; save(); drawDeck(); }
 function newDeck(){
